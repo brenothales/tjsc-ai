@@ -1,0 +1,14 @@
+.processo-panel {
+  animation: slideInRight 0.22s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
