@@ -1,0 +1,213 @@
+@import 'tailwindcss';
+
+/* ── Color remap: gray → zinc (darker/warmer), indigo → violet ────────────── */
+@theme {
+  --color-gray-50:  #fafafa;
+  --color-gray-100: #f4f4f5;
+  --color-gray-200: #e4e4e7;
+  --color-gray-300: #d4d4d8;
+  --color-gray-400: #a1a1aa;
+  --color-gray-500: #71717a;
+  --color-gray-600: #52525b;
+  --color-gray-700: #3f3f46;
+  --color-gray-800: #27272a;
+  --color-gray-900: #18181b;
+  --color-gray-950: #09090b;
+
+  --color-indigo-50:  #ecfdf5;
+  --color-indigo-100: #d1fae5;
+  --color-indigo-200: #a7f3d0;
+  --color-indigo-300: #6ee7b7;
+  --color-indigo-400: #34d399;
+  --color-indigo-500: #10b981;
+  --color-indigo-600: #059669;
+  --color-indigo-700: #047857;
+  --color-indigo-800: #065f46;
+  --color-indigo-900: #064e3b;
+  --color-indigo-950: #022c22;
+}
+
+/* ── Base transition for theme switch ─────────────────────────────────────── */
+*, *::before, *::after {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
+}
+
+/* ── Dark: processo-ref ───────────────────────────────────────────────────── */
+.processo-ref {
+  color: #34d399;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.15s, color 0.15s;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.processo-ref:hover {
+  background: rgba(52, 211, 153, 0.12);
+}
+
+/* ── User message bubble custom class ────────────────────────────────────── */
+.user-bubble {
+  background-color: #065f46;
+  color: #ecfdf5;
+}
+
+.user-bubble .processo-ref {
+  color: #6ee7b7;
+  text-decoration-color: #6ee7b7;
+}
+.user-bubble .processo-ref:hover {
+  background: rgba(110, 231, 183, 0.15);
+}
+
+/* ── Light theme ──────────────────────────────────────────────────────────── */
+html.light {
+  color-scheme: light;
+}
+
+html.light body {
+  background-color: #f8f8fc;
+  color: #18181b;
+}
+
+/* Backgrounds */
+html.light .bg-gray-950 { background-color: #f9fafb !important; }
+html.light .bg-gray-900 { background-color: #f3f4f6 !important; }
+html.light .bg-gray-800 { background-color: #e5e7eb !important; }
+html.light .bg-gray-700 { background-color: #d1d5db !important; }
+html.light .bg-gray-600 { background-color: #c4c4cc !important; }
+html.light .bg-black { background-color: #f9fafb !important; }
+
+/* Borders */
+html.light .border-gray-800 { border-color: #e5e7eb !important; }
+html.light .border-gray-700 { border-color: #d1d5db !important; }
+html.light .divide-gray-800\/60 > * { border-color: rgba(209, 213, 219, 0.6) !important; }
+
+/* Text */
+html.light .text-gray-100 { color: #09090b !important; }
+html.light .text-gray-200 { color: #18181b !important; }
+html.light .text-gray-300 { color: #27272a !important; }
+html.light .text-gray-400 { color: #52525b !important; }
+html.light .text-gray-500 { color: #71717a !important; }
+html.light .text-gray-600 { color: #a1a1aa !important; }
+
+/* User bubble in light */
+html.light .user-bubble {
+  background-color: #d1fae5 !important;
+  color: #022c22 !important;
+}
+
+html.light .ai-badge {
+  background-color: #059669 !important;
+  color: #ffffff !important;
+}
+
+/* Input bg in light */
+html.light .bg-gray-900.border { background-color: #ffffff !important; }
+
+/* Prose in light mode */
+html.light .prose.prose-invert {
+  --tw-prose-body: #18181b;
+  --tw-prose-headings: #09090b;
+  --tw-prose-links: #7c3aed;
+  --tw-prose-bold: #09090b;
+  --tw-prose-counters: #52525b;
+  --tw-prose-bullets: #52525b;
+  --tw-prose-hr: #e4e4e7;
+  --tw-prose-quotes: #27272a;
+  --tw-prose-quote-borders: #d4d4d8;
+  --tw-prose-code: #3b0764;
+  --tw-prose-pre-code: #f4f4f5;
+  --tw-prose-pre-bg: #e4e4e7;
+  --tw-prose-th-borders: #d4d4d8;
+  --tw-prose-td-borders: #e4e4e7;
+}
+
+/* Sidebar hover/active in light */
+html.light .hover\:bg-gray-900:hover      { background-color: #f3f4f6 !important; }
+html.light .hover\:bg-gray-800:hover      { background-color: #e5e7eb !important; }
+html.light .hover\:bg-gray-800\/50:hover  { background-color: #f3f4f6 !important; }
+html.light .hover\:bg-gray-700:hover      { background-color: #d1d5db !important; }
+html.light .hover\:bg-gray-600:hover      { background-color: #d1d5db !important; }
+
+/* Conversa selecionada na sidebar: destaque verde suave em light */
+html.light aside .bg-gray-800            { background-color: #d1fae5 !important; }
+
+/* BETA badge in light */
+html.light .bg-emerald-900\/50 { background-color: #d1fae5 !important; }
+html.light .text-emerald-400   { color: #047857 !important; }
+html.light .border-emerald-800\/50 { border-color: #a7f3d0 !important; }
+
+/* processo-ref in light */
+html.light .processo-ref {
+  color: #047857;
+}
+html.light .processo-ref:hover {
+  background: rgba(4, 120, 87, 0.08);
+}
+
+/* processo-ref inside user bubble (light green bg) */
+html.light .user-bubble .processo-ref {
+  color: #022c22 !important;
+  text-decoration-color: #022c22;
+}
+html.light .user-bubble .processo-ref:hover {
+  background: rgba(2, 44, 34, 0.12) !important;
+}
+
+/* ── Mention dropdown ────────────────────────────────────────────────────── */
+.mention-item:hover,
+.mention-active {
+  background-color: #27272a;
+}
+
+html.light .mention-item:hover,
+html.light .mention-active {
+  background-color: #e5e7eb;
+}
+
+/* Variantes de opacidade de bg sem override ───────────────────────────────── */
+html.light .bg-gray-950\/50      { background-color: #f3f4f6 !important; }
+html.light .bg-indigo-900\/30    { background-color: #d1fae5 !important; }
+html.light .bg-indigo-900\/40    { background-color: #a7f3d0 !important; }
+html.light .bg-indigo-900\/50    { background-color: #d1fae5 !important; }
+html.light .hover\:bg-indigo-900\/40:hover { background-color: #a7f3d0 !important; }
+
+/* indigo-300/200 (minuta modal, copiar button) */
+html.light .text-indigo-300                { color: #047857 !important; }
+html.light .text-indigo-200                { color: #065f46 !important; }
+html.light .hover\:text-indigo-200:hover   { color: #065f46 !important; }
+html.light .border-indigo-800\/50          { border-color: #6ee7b7 !important; }
+
+/* Amber em light: amarelo puro no branco não tem contraste */
+html.light .text-amber-400              { color: #92400e !important; }
+html.light .hover\:text-amber-300:hover { color: #92400e !important; }
+html.light .hover\:text-amber-400:hover { color: #78350f !important; }
+
+/* ── Status badges em light mode ──────────────────────────────────────────── */
+html.light .bg-blue-900\/60    { background-color: #dbeafe !important; }
+html.light .text-blue-300      { color: #1d4ed8 !important; }
+html.light .bg-emerald-900\/60 { background-color: #d1fae5 !important; }
+html.light .text-emerald-300   { color: #065f46 !important; }
+html.light .bg-amber-900\/60   { background-color: #fef3c7 !important; }
+html.light .text-amber-300     { color: #92400e !important; }
+/* arquivado usa bg-gray-700 (já → #d1d5db) + text-gray-300 */
+html.light .text-gray-300      { color: #374151 !important; }
+
+/* Verde ativo (indigo-400 → #34d399): mais legível no fundo branco */
+html.light .text-indigo-400    { color: #047857 !important; }
+html.light .border-indigo-500  { border-color: #059669 !important; }
+html.light .bg-indigo-500      { background-color: #059669 !important; }
+
+/* Timeline dot: border-gray-950 serve como "anel separador" — no light deve ser branco */
+html.light .border-gray-950    { border-color: #f9fafb !important; }
+
+/* ── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+html.light ::-webkit-scrollbar-thumb { background: #d4d4d8; }
+html.light ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }

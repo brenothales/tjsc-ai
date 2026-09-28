@@ -1,0 +1,206 @@
+<!-- Backdrop -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+
+  <!-- Panel -->
+  <div class="flex flex-col w-full max-w-5xl h-[90vh] bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden">
+
+    <!-- Header -->
+    <div class="flex items-center gap-3 px-5 py-3 border-b border-gray-800 shrink-0">
+      <div class="flex-1 min-w-0">
+        <h2 class="text-sm font-semibold text-gray-100">{{ 'minuta.titulo' | translate }}</h2>
+        <p class="text-xs text-gray-500 truncate">Processo {{ svc.numero() }}</p>
+      </div>
+      @if (!svc.isGenerating() && svc.versoes().length > 0) {
+        <button
+          (click)="svc.regenerar(svc.numero())"
+          class="p-1.5 rounded-lg hover:bg-gray-800 text-gray-600 hover:text-gray-300 transition-colors shrink-0"
+          [title]="'minuta.regenerar' | translate"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+        </button>
+      }
+      <button
+        (click)="svc.close()"
+        class="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-gray-300 transition-colors shrink-0"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Version history bar -->
+    @if (svc.historico().length > 1) {
+      <div class="flex items-center gap-2 px-4 py-2 border-b border-gray-800 shrink-0 bg-gray-950/50">
+        <span class="text-[10px] text-gray-600 uppercase tracking-wider shrink-0">{{ 'minuta.versoes_salvas' | translate }}</span>
+        <div class="flex gap-1 flex-1 flex-wrap">
+          @for (h of svc.historico(); track h.versaoMinuta) {
+            <button
+              (click)="svc.carregarVersaoDoHistorico(svc.numero(), h.versaoMinuta)"
+              class="px-2 py-0.5 text-[10px] rounded border transition-colors"
+              [class.border-indigo-500]="svc.versaoAtualNumero() === h.versaoMinuta"
+              [class.text-indigo-400]="svc.versaoAtualNumero() === h.versaoMinuta"
+              [class.bg-indigo-900/30]="svc.versaoAtualNumero() === h.versaoMinuta"
+              [class.border-gray-700]="svc.versaoAtualNumero() !== h.versaoMinuta"
+              [class.text-gray-500]="svc.versaoAtualNumero() !== h.versaoMinuta"
+            >v{{ h.versaoMinuta }}</button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Generating: progress -->
+    @if (svc.isGenerating() || (svc.versoes().length === 0 && !svc.erro())) {
+      <div class="flex-1 flex flex-col px-6 py-8 gap-6 overflow-y-auto">
+
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center justify-between text-xs text-gray-500">
+            <span>
+              @if (versaoEmGeracao()) {
+                {{ 'minuta.gerando' | translate }} <span class="text-indigo-400 font-medium">{{ versaoEmGeracao() }}</span>
+              } @else {
+                {{ 'minuta.iniciando' | translate }}
+              }
+            </span>
+            @if (progressoPct() > 0) {
+              <span class="tabular-nums">{{ progressoPct() }}%</span>
+            }
+          </div>
+          <div class="h-1.5 bg-gray-600 rounded-full overflow-hidden">
+            @if (progressoPct() === 0) {
+              <div class="h-full w-1/3 bg-indigo-500 rounded-full animate-pulse opacity-60"></div>
+            } @else {
+              <div class="h-full bg-indigo-500 rounded-full transition-all duration-500"
+                   [style.width.%]="progressoPct()"></div>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          @for (step of stepsView(); track $index) {
+            <div class="flex items-center gap-3 py-1">
+              @if (step.status === 'done') {
+                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+              } @else if (step.status === 'active') {
+                <span class="w-4 h-4 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin shrink-0"></span>
+              } @else {
+                <span class="w-4 h-4 rounded-full border-2 border-gray-500 shrink-0"></span>
+              }
+              <svg class="w-3.5 h-3.5 shrink-0 transition-colors"
+                   [class.text-emerald-500]="step.status === 'done'"
+                   [class.text-indigo-400]="step.status === 'active'"
+                   [class.text-gray-700]="step.status === 'pending'"
+                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="iconePath(step.acao)"/>
+              </svg>
+              <span class="text-sm transition-colors"
+                    [class.text-emerald-400]="step.status === 'done'"
+                    [class.text-gray-100]="step.status === 'active'"
+                    [class.text-gray-600]="step.status === 'pending'">
+                {{ step.label }}
+              </span>
+            </div>
+          }
+        </div>
+
+        @if (svc.versoes().length > 0) {
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            {{ 'minuta.versoes_concluidas' | translate:{ count: svc.versoes().length } }}
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Error -->
+    @if (svc.erro()) {
+      <div class="flex-1 flex items-center justify-center px-6">
+        <div class="text-center">
+          <p class="text-sm text-red-400 mb-3">{{ svc.erro() }}</p>
+          <button (click)="svc.close()" class="text-xs text-gray-500 hover:text-gray-300 transition-colors">{{ 'minuta.fechar' | translate }}</button>
+        </div>
+      </div>
+    }
+
+    <!-- Results -->
+    @if (!svc.isGenerating() && svc.versoes().length > 0 && !svc.erro()) {
+      <!-- Version tabs -->
+      <div class="flex gap-1 px-4 pt-3 pb-0 shrink-0 border-b border-gray-800">
+        @for (v of svc.versoes(); track v.tipo; let i = $index) {
+          <button
+            (click)="svc.versaoAtiva.set(i)"
+            class="px-3 py-2 text-xs font-semibold rounded-t-lg border-b-2 transition-colors"
+            [class.border-indigo-500]="svc.versaoAtiva() === i"
+            [class.text-indigo-400]="svc.versaoAtiva() === i"
+            [class.bg-gray-800]="svc.versaoAtiva() === i"
+            [class.border-transparent]="svc.versaoAtiva() !== i"
+            [class.text-gray-500]="svc.versaoAtiva() !== i"
+            [class.hover:text-gray-300]="svc.versaoAtiva() !== i"
+          >
+            {{ tipoLabel(v.tipo) }}
+          </button>
+        }
+      </div>
+
+      @if (versaoAtual()) {
+        <!-- Section tabs + actions -->
+        <div class="flex items-center gap-2 px-4 py-2 border-b border-gray-800 shrink-0">
+          <div class="flex gap-1 flex-1">
+            @for (s of secoes; track s.id) {
+              <button
+                (click)="svc.secaoAtiva.set(s.id)"
+                class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
+                [class.bg-indigo-900/50]="svc.secaoAtiva() === s.id"
+                [class.text-indigo-300]="svc.secaoAtiva() === s.id"
+                [class.text-gray-500]="svc.secaoAtiva() !== s.id"
+                [class.hover:text-gray-300]="svc.secaoAtiva() !== s.id"
+              >{{ s.label }}</button>
+            }
+          </div>
+          <button
+            (click)="copiarSecao()"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors"
+            [title]="'minuta.copiar_secao_titulo' | translate"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+            {{ 'minuta.copiar_secao' | translate }}
+          </button>
+          <button
+            (click)="copiarCompleta()"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-indigo-300 hover:text-indigo-200 hover:bg-indigo-900/40 border border-indigo-800/50 transition-colors"
+            [title]="'minuta.copiar_completa_titulo' | translate"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            {{ 'minuta.copiar_completa' | translate }}
+          </button>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1 overflow-y-auto px-6 py-5">
+          <div
+            class="prose prose-invert prose-sm max-w-none
+                   prose-headings:text-gray-100 prose-headings:font-semibold
+                   prose-p:text-gray-300 prose-p:leading-relaxed
+                   prose-strong:text-gray-100
+                   prose-li:text-gray-300"
+            [innerHTML]="conteudoHtml()"
+          ></div>
+        </div>
+      }
+    }
+
+  </div>
+</div>

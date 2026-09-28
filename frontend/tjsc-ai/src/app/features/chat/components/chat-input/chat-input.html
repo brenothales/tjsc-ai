@@ -1,0 +1,130 @@
+<div class="px-4 py-4 bg-black">
+  <div class="max-w-3xl mx-auto">
+
+    @if (showSuggestions()) {
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        @for (s of suggestions(); track s) {
+          <button
+            (click)="selectSuggestion(s)"
+            class="text-left px-3 py-2.5 rounded-xl border border-gray-700 bg-gray-900 hover:border-indigo-500 hover:bg-gray-800 text-xs text-gray-300 hover:text-gray-100 transition-all leading-relaxed"
+          >{{ s }}</button>
+        }
+      </div>
+    }
+
+    <div class="relative">
+
+      @if (templatesOpen()) {
+        <div class="absolute bottom-full mb-2 left-0 right-0 bg-gray-900 border border-gray-700 rounded-xl shadow-xl overflow-hidden z-50">
+          <div class="px-4 py-2.5 border-b border-gray-800 flex items-center justify-between">
+            <span class="text-xs font-medium text-gray-400">{{ 'input.templates_titulo' | translate }}</span>
+            <button (click)="templatesOpen.set(false)" class="text-gray-500 hover:text-gray-300 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="max-h-72 overflow-y-auto">
+            @for (cat of templateCategories(); track cat.category) {
+              <div class="px-4 pt-3 pb-1">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">{{ cat.category }}</p>
+                @for (tpl of cat.templates; track tpl.label) {
+                  <button
+                    (click)="selectTemplate(tpl)"
+                    class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors mb-1 group"
+                  >
+                    <span class="block text-sm text-gray-200 group-hover:text-white">{{ tpl.label }}</span>
+                    <span class="block text-xs text-gray-500 truncate">{{ tpl.text }}</span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (mentionOpen() && (mentionResults().length > 0 || mentionLoading())) {
+        <div class="absolute bottom-full mb-2 left-0 right-0 bg-gray-900 border border-gray-700 rounded-xl shadow-xl overflow-hidden z-50 max-h-64 overflow-y-auto">
+          @if (mentionLoading() && mentionResults().length === 0) {
+            <div class="px-4 py-3 text-xs text-gray-500">{{ 'input.buscando' | translate }}</div>
+          }
+          @for (result of mentionResults(); track result.value; let i = $index) {
+            <button
+              (mousedown)="$event.preventDefault(); selectMention(result)"
+              [class.mention-active]="i === mentionActiveIndex()"
+              class="mention-item w-full flex items-center gap-3 px-4 py-2.5 transition-colors text-left"
+            >
+              <span class="shrink-0 text-xs font-medium px-1.5 py-0.5 rounded"
+                [class]="result.type === 'processo' ? 'bg-indigo-900 text-indigo-300' :
+                         result.type === 'magistrado' ? 'bg-emerald-900 text-emerald-300' :
+                         'bg-amber-900 text-amber-300'"
+              >
+                {{ result.type === 'processo' ? 'P' : result.type === 'magistrado' ? 'M' : 'C' }}
+              </span>
+              <span class="min-w-0">
+                <span class="block text-sm text-gray-100 truncate">{{ result.label }}</span>
+                @if (result.sublabel) {
+                  <span class="block text-xs text-gray-500 truncate">{{ result.sublabel }}</span>
+                }
+              </span>
+            </button>
+          }
+        </div>
+      }
+
+      <div
+        class="flex items-center gap-3 rounded-2xl border border-gray-800 bg-black px-4 py-3 focus-within:border-indigo-500 transition-colors"
+      >
+        <button
+          (click)="toggleTemplates()"
+          [class.text-indigo-400]="templatesOpen()"
+          [class.text-gray-500]="!templatesOpen()"
+          class="hover:text-gray-300 transition-colors shrink-0"
+          [title]="'input.templates_titulo' | translate"
+          [attr.aria-label]="'input.templates_titulo' | translate"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </button>
+
+        <textarea
+          #textarea
+          class="flex-1 bg-transparent resize-none outline-none text-sm leading-relaxed placeholder:text-gray-500 max-h-48"
+          [placeholder]="'input.placeholder' | translate"
+          rows="1"
+          [disabled]="disabled()"
+          [value]="value()"
+          (input)="onInput($event)"
+          (keydown)="onKeydown($event)"
+        ></textarea>
+
+        @if (disabled()) {
+          <button
+            (click)="stop.emit()"
+            class="p-2 rounded-lg bg-red-600 hover:bg-red-500 transition-colors shrink-0"
+            [attr.aria-label]="'input.parar' | translate"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <rect x="6" y="6" width="12" height="12" rx="1"/>
+            </svg>
+          </button>
+        } @else {
+          <button
+            (click)="submit()"
+            [disabled]="!value().trim()"
+            class="p-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0"
+            [attr.aria-label]="'input.enviar' | translate"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+            </svg>
+          </button>
+        }
+      </div>
+    </div>
+    <p class="text-center text-xs text-gray-600 mt-2">{{ 'input.dica' | translate }}</p>
+
+  </div>
+</div>

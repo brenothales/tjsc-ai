@@ -1,0 +1,329 @@
+@let s = panel.state();
+@if (s) {
+<div
+  class="processo-panel flex flex-col h-full border-l border-gray-800 bg-gray-950 overflow-hidden relative"
+  [style.width.px]="panelWidth()"
+>
+  <div
+    (mousedown)="startResize($event)"
+    class="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize z-10 group"
+    [title]="'painel.arrastar' | translate"
+  >
+    <div class="absolute inset-y-0 left-0 w-1 group-hover:bg-indigo-500/50 transition-colors"
+         [class.bg-indigo-500]="resizing()"></div>
+  </div>
+
+  <div class="flex items-center gap-2 px-4 py-3 border-b border-gray-800 shrink-0">
+    @if (selectedDoc() && s.aba === 'documentos') {
+      <button
+        (click)="backToDocs()"
+        class="p-2 rounded hover:bg-gray-800 text-gray-400 hover:text-gray-100 transition-colors"
+        [attr.aria-label]="'painel.voltar' | translate"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <span class="flex-1 text-xs font-semibold text-gray-300 truncate">{{ selectedDoc()!.tipo }}</span>
+    } @else {
+      <span class="flex-1 text-xs font-semibold text-indigo-400 truncate">{{ s.numero }}</span>
+
+      <div class="relative">
+        @if (minuta.isGenerating() && minuta.numero() === s.numero) {
+          <button
+            (click)="minuta.open(s.numero)"
+            class="p-2 rounded hover:bg-gray-800 text-indigo-400 transition-colors"
+            [title]="'painel.gerando_minuta' | translate"
+          >
+            <span class="w-4 h-4 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin block"></span>
+          </button>
+        } @else {
+          <button
+            (click)="toggleDropdown()"
+            class="p-2 rounded hover:bg-gray-800 text-gray-400 hover:text-gray-100 transition-colors"
+            [title]="'painel.acoes' | translate"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+            </svg>
+          </button>
+        }
+
+        @if (dropdownOpen()) {
+          <div class="fixed inset-0 z-10" (click)="closeDropdown()"></div>
+
+          <div class="absolute right-0 top-full mt-1 w-52 bg-gray-900 border border-gray-700 rounded-lg shadow-2xl z-20 py-1 overflow-hidden">
+            @for (action of insightActions; track action.key) {
+              <button
+                (click)="sendInsight(action); closeDropdown()"
+                [disabled]="chat.isStreaming()"
+                class="w-full text-left px-3 py-2 text-xs text-gray-300 hover:bg-gray-800 hover:text-gray-100 disabled:opacity-40 transition-colors flex items-center gap-2"
+              >
+                {{ action.label }}
+              </button>
+            }
+            @if (isEmAndamento()) {
+              <div class="my-1 border-t border-gray-800"></div>
+              @if (minuta.hasMinuta(s.numero)) {
+                <button
+                  (click)="minuta.open(s.numero); closeDropdown()"
+                  class="w-full text-left px-3 py-2 text-xs text-amber-400 hover:bg-gray-800 hover:text-amber-300 transition-colors flex items-center gap-2"
+                >
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                  {{ 'painel.ver_minuta' | translate }}
+                </button>
+                <button
+                  (click)="minuta.regenerar(s.numero); closeDropdown()"
+                  class="w-full text-left px-3 py-2 text-xs text-gray-400 hover:bg-gray-800 hover:text-gray-300 transition-colors flex items-center gap-2"
+                >
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                  </svg>
+                  {{ 'painel.nova_versao' | translate }}
+                </button>
+              } @else {
+                <button
+                  (click)="minuta.open(s.numero); closeDropdown()"
+                  class="w-full text-left px-3 py-2 text-xs text-amber-400 hover:bg-gray-800 hover:text-amber-300 transition-colors flex items-center gap-2"
+                >
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                  {{ 'painel.gerar_minuta' | translate }}
+                </button>
+              }
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <button
+      (click)="close()"
+      class="p-2 rounded hover:bg-gray-800 text-gray-400 hover:text-gray-100 transition-colors"
+      [attr.aria-label]="'painel.fechar' | translate"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  @if (!selectedDoc() || s.aba !== 'documentos') {
+    <div class="flex border-b border-gray-800 shrink-0">
+      <button
+        (click)="setAba('informacoes')"
+        class="flex-1 px-2 py-2.5 text-xs font-medium transition-colors border-b-2"
+        [class.border-indigo-500]="s.aba === 'informacoes'"
+        [class.text-indigo-400]="s.aba === 'informacoes'"
+        [class.border-transparent]="s.aba !== 'informacoes'"
+        [class.text-gray-500]="s.aba !== 'informacoes'"
+      >{{ 'painel.abas.informacoes' | translate }}</button>
+
+      <button
+        (click)="setAba('movimentacoes')"
+        class="flex-1 px-2 py-2.5 text-xs font-medium transition-colors border-b-2 inline-flex items-center justify-center gap-2"
+        [class.border-indigo-500]="s.aba === 'movimentacoes'"
+        [class.text-indigo-400]="s.aba === 'movimentacoes'"
+        [class.border-transparent]="s.aba !== 'movimentacoes'"
+        [class.text-gray-500]="s.aba !== 'movimentacoes'"
+      >
+        {{ 'painel.abas.movimentacoes' | translate }}
+        @if (totalMovs() !== null) {
+          <span class="px-1.5 py-0.5 rounded-full text-[10px] leading-none font-semibold"
+            [class.bg-indigo-500]="s.aba === 'movimentacoes'"
+            [class.text-white]="s.aba === 'movimentacoes'"
+            [class.bg-gray-700]="s.aba !== 'movimentacoes'"
+            [class.text-gray-400]="s.aba !== 'movimentacoes'"
+          >{{ totalMovs() }}</span>
+        }
+      </button>
+
+      <button
+        (click)="setAba('documentos')"
+        class="flex-1 px-2 py-2.5 text-xs font-medium transition-colors border-b-2 inline-flex items-center justify-center gap-2"
+        [class.border-indigo-500]="s.aba === 'documentos'"
+        [class.text-indigo-400]="s.aba === 'documentos'"
+        [class.border-transparent]="s.aba !== 'documentos'"
+        [class.text-gray-500]="s.aba !== 'documentos'"
+      >
+        {{ 'painel.abas.documentos' | translate }}
+        @if (totalDocs() !== null) {
+          <span class="px-1.5 py-0.5 rounded-full text-[10px] leading-none font-semibold"
+            [class.bg-indigo-500]="s.aba === 'documentos'"
+            [class.text-white]="s.aba === 'documentos'"
+            [class.bg-gray-700]="s.aba !== 'documentos'"
+            [class.text-gray-400]="s.aba !== 'documentos'"
+          >{{ totalDocs() }}</span>
+        }
+      </button>
+    </div>
+  }
+
+  <div class="flex-1 overflow-y-auto min-h-0">
+
+    @if (s.aba === 'informacoes') {
+      @if (loadingCtx()) {
+        <div class="px-4 py-8 text-center text-xs text-gray-500">{{ 'painel.carregando' | translate }}</div>
+      } @else if (!ctx()) {
+        <div class="px-4 py-8 text-center text-xs text-gray-500">{{ 'painel.nao_encontrado' | translate }}</div>
+      } @else {
+        <div class="px-4 py-4 flex flex-col gap-5">
+
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold px-2.5 py-1 rounded-md {{ situacaoClass(ctx()!.processo.situacao) }}">
+              {{ ctx()!.situacaoNormalizada || ctx()!.processo.situacao }}
+            </span>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">{{ 'painel.secoes.processo' | translate }}</p>
+            @for (row of infoRows(); track row.label) {
+              <div class="flex gap-2 text-xs leading-snug">
+                <span class="text-gray-500 shrink-0 w-16">{{ row.label }}</span>
+                <span class="text-gray-200">{{ row.value }}</span>
+              </div>
+            }
+          </div>
+
+          @if (ctx()!.partes.length > 0) {
+            <div class="flex flex-col gap-3">
+              <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">{{ 'painel.secoes.partes' | translate }}</p>
+              @if (partesAtivas().length > 0) {
+                <div class="flex flex-col gap-1">
+                  <span class="text-[10px] font-semibold text-indigo-400 uppercase tracking-wide">{{ 'painel.polo_ativo' | translate }}</span>
+                  @for (parte of partesAtivas(); track parte.id) {
+                    <span class="text-xs text-gray-200 pl-1">{{ parte.nome }}</span>
+                  }
+                </div>
+              }
+              @if (partesPassivas().length > 0) {
+                <div class="flex flex-col gap-1">
+                  <span class="text-[10px] font-semibold text-red-400 uppercase tracking-wide">{{ 'painel.polo_passivo' | translate }}</span>
+                  @for (parte of partesPassivas(); track parte.id) {
+                    <span class="text-xs text-gray-200 pl-1">{{ parte.nome }}</span>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          @if (ctx()!.magistrados.length > 0) {
+            <div class="flex flex-col gap-2">
+              <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">{{ 'painel.secoes.magistrado' | translate }}</p>
+              @for (mag of ctx()!.magistrados; track mag.id) {
+                <div class="flex items-center gap-2 text-xs">
+                  <span class="text-gray-200">{{ mag.nome }}</span>
+                  <span class="text-[10px]"
+                        [class.text-indigo-400]="mag.situacao.toLowerCase() === 'ativo'"
+                        [class.text-gray-500]="mag.situacao.toLowerCase() !== 'ativo'">
+                    ({{ mag.situacao }})
+                  </span>
+                </div>
+              }
+            </div>
+          }
+
+        </div>
+      }
+    }
+
+    @if (s.aba === 'movimentacoes') {
+      <div class="py-3">
+        @if (loadingMovs() && movs().length === 0) {
+          <div class="px-4 py-6 text-center text-xs text-gray-500">{{ 'painel.carregando' | translate }}</div>
+        }
+        @if (!loadingMovs() && movs().length === 0) {
+          <div class="px-4 py-6 text-center text-xs text-gray-500">{{ 'painel.sem_movimentacao' | translate }}</div>
+        }
+        @for (mov of movs(); track mov.id; let last = $last) {
+          <div class="flex gap-3 px-4">
+            <div class="flex flex-col items-center pt-1 shrink-0">
+              <div class="w-2 h-2 rounded-full bg-indigo-500 border-2 border-gray-950 shrink-0"></div>
+              @if (!last || hasMore()) {
+                <div class="w-px flex-1 min-h-4 bg-gray-800 mt-1"></div>
+              }
+            </div>
+            <div class="pb-4 min-w-0">
+              <div class="text-xs text-gray-500 mb-0.5">{{ formatDate(mov.dataMov) }}</div>
+              <div class="text-sm text-gray-200 leading-snug">{{ mov.descricao }}</div>
+            </div>
+          </div>
+        }
+        @if (loadingMovs() && movs().length > 0) {
+          <div class="px-4 py-3 text-center text-xs text-gray-500">{{ 'painel.carregando' | translate }}</div>
+        }
+        @if (hasMore() && !loadingMovs()) {
+          <div class="px-4 py-1 text-center">
+            <button (click)="loadMore()" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+              {{ 'painel.carregar_mais' | translate }}
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    @if (s.aba === 'documentos' && !selectedDoc()) {
+      @if (loadingDocs()) {
+        <div class="px-4 py-6 text-center text-xs text-gray-500">{{ 'painel.carregando_docs' | translate }}</div>
+      } @else if (docs().length === 0) {
+        <div class="px-4 py-6 text-center text-xs text-gray-500">{{ 'painel.sem_documento' | translate }}</div>
+      } @else {
+        <div class="divide-y divide-gray-800/60">
+          @for (doc of docs(); track doc.id) {
+            <button
+              (click)="selectDoc(doc)"
+              class="w-full text-left px-4 py-3 hover:bg-gray-800/50 transition-colors group"
+            >
+              <div class="flex items-start justify-between gap-2">
+                <span class="text-sm font-medium text-gray-200 group-hover:text-indigo-300 transition-colors flex-1 min-w-0">
+                  {{ doc.tipo }}
+                </span>
+                <div class="flex items-center gap-1 shrink-0">
+                  <button
+                    (click)="resumirDoc(doc, $event)"
+                    class="hidden group-hover:flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-900/50 text-indigo-300 hover:bg-indigo-800/60 transition-colors"
+                    title="Resumir documento no chat"
+                  >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    Resumir
+                  </button>
+                  <svg class="w-3.5 h-3.5 text-gray-600 group-hover:text-indigo-400 mt-0.5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="flex gap-3 mt-1 text-xs text-gray-500 flex-wrap">
+                <span class="whitespace-nowrap">{{ formatDate(doc.dataJuntada) }}</span>
+                <span class="whitespace-nowrap">{{ doc.numPaginas }} pág{{ doc.numPaginas !== 1 ? 's' : '' }}.</span>
+                <span class="truncate">{{ doc.autor }}</span>
+              </div>
+            </button>
+          }
+        </div>
+      }
+    }
+
+    @if (s.aba === 'documentos' && selectedDoc()) {
+      <div class="px-4 py-3">
+        <div class="flex gap-4 text-xs text-gray-500 mb-3 pb-3 border-b border-gray-800 flex-wrap">
+          <span class="whitespace-nowrap">{{ formatDate(selectedDoc()!.dataJuntada) }}</span>
+          <span class="whitespace-nowrap">{{ selectedDoc()!.numPaginas }} págs.</span>
+          <span class="truncate">{{ selectedDoc()!.autor }}</span>
+        </div>
+        <pre class="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed font-sans">{{ selectedDoc()!.texto }}</pre>
+      </div>
+    }
+
+  </div>
+</div>
+}
