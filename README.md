@@ -7,15 +7,20 @@ Chat de IA que responde, em linguagem natural, perguntas sobre processos judicia
 
 ---
 
-## Tecnologias
+## Tecnologias e Versões
 
-| Camada | Tecnologia |
-|---|---|
-| LLM | OpenAI GPT-4o-mini |
-| Agent / Backend | Spring AI 1.0 + MCP Streamable HTTP |
-| Banco de dados | SQLite (read-only) · MongoDB · Redis |
-| Frontend | Angular 21 · Tailwind CSS · SSE Streaming |
-| Infraestrutura | Docker Compose |
+| Camada | Tecnologia | Versão |
+|---|---|---|
+| LLM | OpenAI GPT-4o-mini | — |
+| Agent / Backend | Spring Boot | 4.1.1 |
+| Agent / Backend | Spring AI | 2.0.1 |
+| Agent / Backend | Java | 25 |
+| Agent / Backend | Maven (via wrapper) | 3.x (incluído) |
+| Banco de dados | SQLite · MongoDB · Redis | — |
+| Frontend | Angular | 21 |
+| Frontend | Node.js | ≥ 22 |
+| Frontend | pnpm | 10.15.0 |
+| Infraestrutura | Docker Compose | ≥ 2.20 |
 
 ---
 
@@ -57,13 +62,13 @@ graph TD
 
 ## Pré-requisitos
 
-- Docker e Docker Compose
+- Docker e Docker Compose ≥ 2.20
 - Chave de API da OpenAI (`OPENAI_API_KEY`)
 - Arquivo `desafio.sqlite` fornecido pelo TJSC
 
 ---
 
-## Como executar
+## Como executar (Docker — recomendado)
 
 ### 1. Copiar o banco de dados
 
@@ -96,18 +101,88 @@ Aguarde cerca de 1–2 minutos para todos os serviços ficarem saudáveis.
 
 ---
 
-## Serviços e portas
+## Como executar sem Docker
 
-| Serviço | Porta | Descrição |
+### Pré-requisitos locais
+
+| Ferramenta | Versão mínima | Instalação |
 |---|---|---|
-| `frontend` | 4200 | Interface de chat |
-| `process-agent` | 8083 | Agente conversacional |
-| `process-mcp-server` | 8082 | 14 ferramentas MCP |
-| `process-data-service` | 8081 | API REST sobre o SQLite |
-| MongoDB | 27017 | Memória das conversas e minutas |
-| Redis | 6379 | Cache de respostas |
-| Mongo Express | 8084 | Admin UI do MongoDB |
-| Redis Insight | 8001 | Admin UI do Redis |
+| Java (JDK) | 25 | [adoptium.net](https://adoptium.net) |
+| Maven | 3.9+ | incluído via `mvnw` em cada serviço |
+| Node.js | 22 | [nodejs.org](https://nodejs.org) |
+| pnpm | 10.15.0 | ver abaixo |
+| MongoDB | 7+ | [mongodb.com](https://www.mongodb.com/try/download/community) |
+| Redis | 7+ | [redis.io](https://redis.io/downloads) |
+
+#### Instalar o pnpm
+
+```bash
+# via corepack (recomendado, já incluso no Node 22+)
+corepack enable
+corepack prepare pnpm@10.15.0 --activate
+
+# ou via npm
+npm install -g pnpm@10.15.0
+```
+
+### Sequência de inicialização
+
+Os serviços têm dependências entre si — respeite a ordem abaixo:
+
+**1. process-data-service** (porta 8081) — não tem dependências externas além do SQLite:
+
+```bash
+cd backend/process-data-service
+cp ../../desafio.sqlite data/desafio.sqlite
+./mvnw spring-boot:run
+```
+
+**2. process-mcp-server** (porta 8082) — depende do `process-data-service`:
+
+```bash
+cd backend/process-mcp-server
+./mvnw spring-boot:run
+```
+
+**3. process-agent** (porta 8083) — depende do MCP server, MongoDB e Redis:
+
+```bash
+cd backend/process-agent
+OPENAI_API_KEY=sk-... ./mvnw spring-boot:run
+```
+
+> Variáveis que o agent espera:
+> ```
+> OPENAI_API_KEY=<sua chave>
+> MONGODB_HOST=localhost        # default
+> MONGODB_PORT=27017            # default
+> REDIS_HOST=localhost          # default
+> MCP_SERVER_URL=http://localhost:8082
+> ```
+
+**4. Frontend** (porta 4200):
+
+```bash
+cd frontend/tjsc-ai
+pnpm install
+pnpm start
+```
+
+---
+
+## Serviços, portas e painéis
+
+| Serviço | Porta | Descrição | Swagger / UI |
+|---|---|---|---|
+| `frontend` | 4200 | Interface de chat | — |
+| `process-agent` | 8083 | Agente conversacional | [Boot UI](http://localhost:8083/bootui) |
+| `process-mcp-server` | 8082 | 14 ferramentas MCP | [Boot UI](http://localhost:8082/bootui) |
+| `process-data-service` | 8081 | API REST sobre o SQLite | [Swagger UI](http://localhost:8081/swagger-ui.html) · [Boot UI](http://localhost:8081/bootui) |
+| MongoDB | 27017 | Memória das conversas e minutas | [Mongo Express](http://localhost:8084) |
+| Redis | 6379 | Cache de respostas | [Redis Insight](http://localhost:8001) |
+
+> **Boot UI** é o painel de administração embutido do Spring Boot (health, beans, métricas, env).  
+> **Swagger UI** do `process-data-service` documenta todos os endpoints REST com possibilidade de execução interativa.
 
 ---
 
@@ -137,7 +212,7 @@ Aguarde cerca de 1–2 minutos para todos os serviços ficarem saudáveis.
 | [Minuta Loop](knowledge/patterns/minuta-loop.md) | Pipeline de geração de minuta de sentença |
 | [SSE Streaming](knowledge/patterns/sse-streaming.md) | Streaming de respostas via Server-Sent Events |
 | [Advisor Chain](knowledge/patterns/advisor-chain.md) | Cadeia de advisors do Spring AI |
-| [Guardrail em 5 Camadas](knowledge/patterns/guardrail-layers.md) | Proteção em defesa-em-profundidade — input · tool · output no agente + SqlController · JDBC read-only no data service |
+| [Guardrail em 5 Camadas](knowledge/patterns/guardrail-layers.md) | Proteção em defesa-em-profundidade |
 | [Decisões arquiteturais](knowledge/decisions/) | Registro das decisões técnicas do projeto |
 
 Visualização interativa do grafo de conhecimento: abra [`knowledge/viz.html`](knowledge/viz.html) no navegador.
