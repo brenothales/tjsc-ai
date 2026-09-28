@@ -1,8 +1,8 @@
 package br.jus.tjsc.ai.agent.voice.application;
 
 import br.jus.tjsc.ai.agent.voice.api.dto.VoiceSessionResponse;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +38,7 @@ public class VoiceService {
         this.systemPrompt = systemPromptResource.getContentAsString(StandardCharsets.UTF_8);
     }
 
-    public VoiceSessionResponse createSession(String sdpOffer) throws com.fasterxml.jackson.core.JsonProcessingException {
+    public VoiceSessionResponse createSession(String sdpOffer) throws tools.jackson.core.JacksonException {
         log.info("[VoiceService] criando sessão Live — model={} voice={}", MODEL, VOICE);
 
         Map<String, Object> sessionConfig = Map.of(

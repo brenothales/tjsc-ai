@@ -23,7 +23,7 @@ class VoiceController {
     }
 
     @PostMapping("/session")
-    VoiceSessionResponse createSession(@RequestBody VoiceSessionRequest request) throws com.fasterxml.jackson.core.JsonProcessingException {
+    VoiceSessionResponse createSession(@RequestBody VoiceSessionRequest request) throws tools.jackson.core.JacksonException {
         return voiceService.createSession(request.sdp());
     }
 
