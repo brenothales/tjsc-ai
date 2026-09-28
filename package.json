@@ -1,6 +1,6 @@
 {
   "name": "tjsc-ai-platform",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.0",
   "description": "Plataforma de IA para magistrados do TJSC — Diretoria de Tecnologia da Informação",
   "private": true,
   "scripts": {
