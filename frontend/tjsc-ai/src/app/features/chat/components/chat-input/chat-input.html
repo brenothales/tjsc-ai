@@ -100,6 +100,9 @@
           (keydown)="onKeydown($event)"
         ></textarea>
 
+        <!-- voice-live: remova esta linha para desativar -->
+        <app-voice-button />
+
         @if (disabled()) {
           <button
             (click)="stop.emit()"

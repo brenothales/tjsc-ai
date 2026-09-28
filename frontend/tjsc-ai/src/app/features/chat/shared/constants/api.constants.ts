@@ -8,4 +8,5 @@ export const API = {
   minutaGerar: `${API_BASE}/minuta/gerar`,
   minutaHistorico: (numero: string) => `${API_BASE}/minuta/${encodeURIComponent(numero)}/historico`,
   minutaVersao: (numero: string, versao: number) => `${API_BASE}/minuta/${encodeURIComponent(numero)}/${versao}`,
+  voiceSession: `${API_BASE}/voice/session`,
 } as const;

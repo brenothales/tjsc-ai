@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ChatService } from '../../shared/services/chat.service';
 import { MentionService, MentionResult } from '../../shared/services/mention.service';
+import { VoiceButtonComponent } from '../voice-button/voice-button';
 import { Subject } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 
@@ -20,7 +21,7 @@ const MENTION_RE = /@([^@:\n]*)$/;
 
 @Component({
   selector: 'app-chat-input',
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, TranslatePipe, VoiceButtonComponent],
   templateUrl: './chat-input.html',
   styleUrl: './chat-input.css',
 })
