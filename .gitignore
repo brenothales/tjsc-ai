@@ -1,0 +1,46 @@
+# Claude Code
+.claude/
+**/CLAUDE.md
+
+# Secrets
+.env
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Builds
+dist/
+build/
+out/
+*.jar
+!*-sources.jar
+
+# Angular
+frontend/tjsc-ai/dist/
+frontend/tjsc-ai/.angular/
+
+# MongoDB data volume
+backend/mongodb/
+
+# Java / Spring
+backend/**/.mvn/wrapper/maven-wrapper.jar
+backend/**/target/
+backend/**/*.class
+backend/**/*.log
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+Thumbs.db
+
+node_modules/
+package-lock.json
+.pnpm-store/
