@@ -38,7 +38,7 @@ public class VoiceService {
         this.systemPrompt = systemPromptResource.getContentAsString(StandardCharsets.UTF_8);
     }
 
-    public VoiceSessionResponse createSession(String sdpOffer) {
+    public VoiceSessionResponse createSession(String sdpOffer) throws com.fasterxml.jackson.core.JsonProcessingException {
         log.info("[VoiceService] criando sessão Live — model={} voice={}", MODEL, VOICE);
 
         Map<String, Object> sessionConfig = Map.of(
@@ -55,12 +55,13 @@ public class VoiceService {
                 )
         );
 
-        JsonNode response = restClient.post()
+        String raw = restClient.post()
                 .uri(LIVE_SESSIONS)
                 .body(body)
                 .retrieve()
-                .body(JsonNode.class);
+                .body(String.class);
 
+        JsonNode response = objectMapper.readTree(raw);
         String sessionId = response.path("session").path("id").asText();
         String sdpAnswer = response.path("transport").path("sdp").asText();
 
