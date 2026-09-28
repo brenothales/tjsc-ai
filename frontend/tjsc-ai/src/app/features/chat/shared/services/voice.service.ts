@@ -32,10 +32,16 @@ export class VoiceService {
   private pc: RTCPeerConnection | null = null;
   private dc: RTCDataChannel | null = null;
   private audioEl: HTMLAudioElement | null = null;
+  private localStream: MediaStream | null = null;
   private closeTimeout: ReturnType<typeof setTimeout> | null = null;
+  private closeRequested = false;
 
   get isActive(): boolean {
     return this.state() !== 'idle' && this.state() !== 'error';
+  }
+
+  get isUiActive(): boolean {
+    return this.isActive && this.state() !== 'closing';
   }
 
   toggle(): void {
@@ -82,6 +88,7 @@ export class VoiceService {
     this.voiceConversationId.set(conversationId);
 
     this.state.set('connecting');
+    this.closeRequested = false;
     this.transcript.set('');
     this.agentText.set('');
     this.errorMessage.set('');
@@ -103,10 +110,12 @@ export class VoiceService {
       };
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.localStream = stream;
       stream.getTracks().forEach((t) => this.pc!.addTrack(t, stream));
 
       this.dc = this.pc.createDataChannel('oai-events');
       this.dc.onmessage = (e) => this.handleEvent(JSON.parse(e.data) as RealtimeEvent);
+      this.dc.onopen = () => this.requestSessionClose();
 
       const offer = await this.pc.createOffer();
       await this.pc.setLocalDescription(offer);
@@ -131,16 +140,13 @@ export class VoiceService {
   stop(): void {
     if (this.state() === 'idle' || this.state() === 'closing') return;
 
-    if (this.dc?.readyState === 'open') {
-      this.state.set('closing');
-      this.closeTimeout = setTimeout(() => {
-        this.finishStop(false);
-      }, 15_000);
-      this.sendEvent({ type: 'session.close' });
-      return;
-    }
+    // Stop sending microphone audio immediately while the Live session finalizes.
+    this.muteMicrophone();
+    this.state.set('closing');
+    this.closeRequested = true;
 
-    this.finishStop();
+    this.closeTimeout = setTimeout(() => this.finishStop(false), 15_000);
+    this.requestSessionClose();
   }
 
   private finishStop(confirmed = true): void {
@@ -148,6 +154,7 @@ export class VoiceService {
       clearTimeout(this.closeTimeout);
       this.closeTimeout = null;
     }
+    this.closeRequested = false;
     this.cleanup();
     this.state.set(confirmed ? 'idle' : 'error');
     if (!confirmed) {
@@ -163,6 +170,10 @@ export class VoiceService {
   }
 
   private handleEvent(event: RealtimeEvent): void {
+    if (this.state() === 'closing' && event.type !== 'session.closed' && event.type !== 'error') {
+      return;
+    }
+
     switch (event['type']) {
       case 'session.started':
         this.state.set('listening');
@@ -285,7 +296,14 @@ export class VoiceService {
     }
   }
 
+  private requestSessionClose(): void {
+    if (!this.closeRequested || this.dc?.readyState !== 'open') return;
+    this.closeRequested = false;
+    this.sendEvent({ type: 'session.close' });
+  }
+
   private cleanup(): void {
+    this.stopMicrophone();
     this.dc?.close();
     this.pc?.close();
     if (this.audioEl) {
@@ -294,5 +312,16 @@ export class VoiceService {
     }
     this.pc = null;
     this.dc = null;
+  }
+
+  private stopMicrophone(): void {
+    this.localStream?.getTracks().forEach((track) => track.stop());
+    this.localStream = null;
+  }
+
+  private muteMicrophone(): void {
+    this.localStream?.getAudioTracks().forEach((track) => {
+      track.enabled = false;
+    });
   }
 }

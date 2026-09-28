@@ -14,7 +14,7 @@
 
     <div class="relative">
 
-      @if (!voice.isActive && templatesOpen()) {
+      @if (!voice.isUiActive && templatesOpen()) {
         <div class="absolute bottom-full mb-2 left-0 right-0 bg-gray-900 border border-gray-700 rounded-xl shadow-xl overflow-hidden z-50">
           <div class="px-4 py-2.5 border-b border-gray-800 flex items-center justify-between">
             <span class="text-xs font-medium text-gray-400">{{ 'input.templates_titulo' | translate }}</span>
@@ -43,7 +43,7 @@
         </div>
       }
 
-      @if (!voice.isActive && mentionOpen() && (mentionResults().length > 0 || mentionLoading())) {
+      @if (!voice.isUiActive && mentionOpen() && (mentionResults().length > 0 || mentionLoading())) {
         <div class="absolute bottom-full mb-2 left-0 right-0 bg-gray-900 border border-gray-700 rounded-xl shadow-xl overflow-hidden z-50 max-h-64 overflow-y-auto">
           @if (mentionLoading() && mentionResults().length === 0) {
             <div class="px-4 py-3 text-xs text-gray-500">{{ 'input.buscando' | translate }}</div>
@@ -75,7 +75,7 @@
       <div
         class="flex items-center gap-3 rounded-2xl border border-gray-800 bg-black px-4 py-3 focus-within:border-indigo-500 transition-colors"
       >
-        @if (voice.isActive) {
+        @if (voice.isUiActive) {
           <div
             class="voice-live-panel flex-1 min-w-0 flex items-center gap-4 py-1"
             [class.voice-live-panel--speaking]="voice.state() === 'user_speaking' || voice.state() === 'agent_speaking'"
@@ -125,7 +125,7 @@
         <!-- voice-live: remova esta linha para desativar -->
         <app-voice-button />
 
-        @if (!voice.isActive && disabled()) {
+        @if (!voice.isUiActive && disabled()) {
           <button
             (click)="stop.emit()"
             class="p-2 rounded-lg bg-red-600 hover:bg-red-500 transition-colors shrink-0"
@@ -135,7 +135,7 @@
               <rect x="6" y="6" width="12" height="12" rx="1"/>
             </svg>
           </button>
-        } @else if (!voice.isActive) {
+        } @else if (!voice.isUiActive) {
           <button
             (click)="submit()"
             [disabled]="!value().trim()"
@@ -149,7 +149,7 @@
         }
       </div>
     </div>
-    @if (voice.isActive) {
+    @if (voice.isUiActive) {
       <p class="text-center text-xs text-gray-600 mt-2">Conversa por voz em andamento. Use “Parar” para encerrar.</p>
     } @else {
       <p class="text-center text-xs text-gray-600 mt-2">{{ 'input.dica' | translate }}</p>
