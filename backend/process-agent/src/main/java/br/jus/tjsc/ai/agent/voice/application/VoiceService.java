@@ -22,7 +22,7 @@ public class VoiceService {
 
     private static final String OPENAI_BASE_URL   = "https://api.openai.com";
     private static final String REALTIME_SESSIONS = "/v1/realtime/sessions";
-    private static final String MODEL             = "gpt-4o-realtime-preview-2024-12-17";
+    private static final String MODEL             = "gpt-live-1";
     private static final String VOICE             = "verse";
 
     private final RestClient   restClient;

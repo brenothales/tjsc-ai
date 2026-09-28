@@ -1,5 +1,5 @@
 export const REALTIME_CONFIG = {
-  model: 'gpt-4o-realtime-preview-2024-12-17',
+  model: 'gpt-live-1',
   voice: 'verse',
   sdpEndpoint: 'https://api.openai.com/v1/realtime',
 } as const;
