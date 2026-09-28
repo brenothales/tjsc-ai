@@ -5,7 +5,7 @@ spring:
     virtual:
       enabled: true
   datasource:
-    url: jdbc:sqlite:${SQLITE_DATABASE_PATH:../desafio.sqlite}
+    url: jdbc:sqlite:${SQLITE_DATABASE_PATH:data/desafio.sqlite}
     driver-class-name: org.sqlite.JDBC
     hikari:
       maximum-pool-size: 1
