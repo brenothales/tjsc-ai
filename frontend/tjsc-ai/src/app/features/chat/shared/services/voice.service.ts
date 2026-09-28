@@ -104,6 +104,7 @@ export class VoiceService {
   }
 
   private handleEvent(event: RealtimeEvent): void {
+    console.log('[Voice] <<', event['type'], event);
     switch (event['type']) {
       case 'session.created':
         this.state.set('listening');
@@ -132,10 +133,12 @@ export class VoiceService {
         break;
 
       case 'response.audio_transcript.delta':
+      case 'session.output_transcript.delta':
         this.agentText.update((t) => t + ((event['delta'] as string) ?? ''));
         break;
 
       case 'response.audio_transcript.done':
+      case 'session.output_transcript.done':
         console.log('[Voice] transcript do agente:', this.agentText());
         this.agentText.set('');
         break;
@@ -158,6 +161,10 @@ export class VoiceService {
         this.errorMessage.set((event['error'] as { message?: string })?.message ?? 'Erro Realtime');
         this.state.set('error');
         this.cleanup();
+        break;
+
+      default:
+        console.log('[Voice] evento desconhecido:', event['type'], event);
         break;
     }
   }
