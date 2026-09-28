@@ -12,7 +12,6 @@ import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -42,28 +41,11 @@ public class VoiceService {
     public VoiceSessionResponse createSession(String sdpOffer) {
         log.info("[VoiceService] criando sessão Live — model={} voice={}", MODEL, VOICE);
 
-        Map<String, Object> consultarAgenteTool = Map.of(
-                "type", "function",
-                "name", "consultar_agente",
-                "description", "Consulta o agente institucional do TJSC para responder perguntas sobre processos, partes, magistrados e movimentações.",
-                "parameters", Map.of(
-                        "type", "object",
-                        "properties", Map.of(
-                                "pergunta", Map.of(
-                                        "type", "string",
-                                        "description", "A pergunta ou consulta a ser respondida pelo agente"
-                                )
-                        ),
-                        "required", List.of("pergunta")
-                )
-        );
-
         Map<String, Object> sessionConfig = Map.of(
                 "model", MODEL,
                 "voice", VOICE,
                 "instructions", systemPrompt,
-                "tools", List.of(consultarAgenteTool),
-                "tool_choice", "auto"
+                "delegation", Map.of("type", "client")
         );
 
         Map<String, Object> body = Map.of(

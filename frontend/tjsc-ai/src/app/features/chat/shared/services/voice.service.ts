@@ -140,11 +140,10 @@ export class VoiceService {
         this.agentText.set('');
         break;
 
-      case 'response.function_call_arguments.done':
-        this.handleToolCall(
-          event['call_id'] as string,
-          event['name'] as string,
-          event['arguments'] as string
+      case 'delegation.request':
+        this.handleDelegation(
+          event['id'] as string,
+          event['query'] as string
         );
         break;
 
@@ -163,49 +162,32 @@ export class VoiceService {
     }
   }
 
-  private async handleToolCall(callId: string, name: string, argsJson: string): Promise<void> {
-    if (name !== 'consultar_agente') return;
-
+  private async handleDelegation(delegationId: string, query: string): Promise<void> {
     this.state.set('tool_executing');
     const startTime = Date.now();
+    console.log('[Voice] delegation.request — query:', query);
 
     try {
-      const args = JSON.parse(argsJson) as { pergunta: string };
-      console.log('[Voice] tool call consultar_agente — pergunta:', args.pergunta);
-
       const res = await fetch(API.voiceAgent, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: args.pergunta, conversationId: this.voiceConversationId }),
+        body: JSON.stringify({ message: query, conversationId: this.voiceConversationId }),
       });
 
       if (!res.ok) throw new Error(`Agent error: ${res.status}`);
       const data = await res.json() as { content: string };
 
-      console.log('[Voice] tool executada em', Date.now() - startTime, 'ms');
+      console.log('[Voice] delegation respondida em', Date.now() - startTime, 'ms');
 
-      this.sendEvent({
-        type: 'conversation.item.create',
-        item: {
-          type: 'function_call_output',
-          call_id: callId,
-          output: data.content,
-        },
-      });
-
-      this.sendEvent({ type: 'response.create' });
+      this.sendEvent({ type: 'delegation.response', id: delegationId, response: data.content });
       this.state.set('listening');
     } catch (err) {
-      console.error('[Voice] erro na tool call:', err);
+      console.error('[Voice] erro na delegation:', err);
       this.sendEvent({
-        type: 'conversation.item.create',
-        item: {
-          type: 'function_call_output',
-          call_id: callId,
-          output: 'Não foi possível obter a resposta do agente.',
-        },
+        type: 'delegation.response',
+        id: delegationId,
+        response: 'Não foi possível obter a resposta do agente.',
       });
-      this.sendEvent({ type: 'response.create' });
       this.state.set('listening');
     }
   }
