@@ -12,6 +12,7 @@ Knowledge base do sistema de IA conversacional para consulta de processos judici
 - [process-mcp-server](/services/process-mcp-server.md) — 14 ferramentas MCP sobre o data service
 - [process-agent](/services/process-agent.md) — Agente conversacional LLM + guardrails + memória
 - [frontend-tjsc-ai](/services/frontend-tjsc-ai.md) — Chat Angular 21 com SSE streaming
+- [voice-live](/services/voice-live.md) — Conversa por voz em tempo real (WebRTC + OpenAI Realtime)
 
 ## Padrões
 
