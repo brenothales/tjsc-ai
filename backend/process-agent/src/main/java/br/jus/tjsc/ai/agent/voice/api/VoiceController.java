@@ -3,6 +3,7 @@ package br.jus.tjsc.ai.agent.voice.api;
 import br.jus.tjsc.ai.agent.chat.infrastructure.ai.AgentService;
 import br.jus.tjsc.ai.agent.voice.api.dto.VoiceAgentRequest;
 import br.jus.tjsc.ai.agent.voice.api.dto.VoiceAgentResponse;
+import br.jus.tjsc.ai.agent.voice.api.dto.VoiceSessionRequest;
 import br.jus.tjsc.ai.agent.voice.api.dto.VoiceSessionResponse;
 import br.jus.tjsc.ai.agent.voice.application.VoiceService;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +23,8 @@ class VoiceController {
     }
 
     @PostMapping("/session")
-    VoiceSessionResponse createSession() {
-        return voiceService.createSession();
+    VoiceSessionResponse createSession(@RequestBody VoiceSessionRequest request) {
+        return voiceService.createSession(request.sdp());
     }
 
     @PostMapping("/agent")

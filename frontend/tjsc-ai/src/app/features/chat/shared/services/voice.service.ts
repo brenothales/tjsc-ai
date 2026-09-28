@@ -1,6 +1,5 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { API } from '../constants/api.constants';
-import { REALTIME_CONFIG } from '../config/realtime.config';
 
 export type VoiceState =
   | 'idle'
@@ -44,9 +43,6 @@ export class VoiceService {
     this.voiceConversationId = crypto.randomUUID();
 
     try {
-      const { clientSecret, sessionId } = await this.fetchSession();
-      this.sessionId = sessionId;
-
       this.pc = new RTCPeerConnection();
       this.audioEl = document.createElement('audio');
       this.audioEl.autoplay = true;
@@ -74,21 +70,17 @@ export class VoiceService {
       const offer = await this.pc.createOffer();
       await this.pc.setLocalDescription(offer);
 
-      const sdpRes = await fetch(
-        `${REALTIME_CONFIG.sdpEndpoint}?model=${REALTIME_CONFIG.model}`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${clientSecret}`,
-            'Content-Type': 'application/sdp',
-          },
-          body: offer.sdp,
-        }
-      );
+      const res = await fetch(API.voiceSession, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sdp: offer.sdp }),
+      });
 
-      if (!sdpRes.ok) throw new Error(`SDP error: ${sdpRes.status}`);
+      if (!res.ok) throw new Error(`Session error: ${res.status}`);
+      const data = await res.json() as { sessionId: string; sdp: string };
 
-      await this.pc.setRemoteDescription({ type: 'answer', sdp: await sdpRes.text() });
+      this.sessionId = data.sessionId;
+      await this.pc.setRemoteDescription({ type: 'answer', sdp: data.sdp });
       console.log('[Voice] WebRTC estabelecido — sessionId:', this.sessionId);
     } catch (err) {
       console.error('[Voice] erro ao iniciar:', err);
@@ -222,13 +214,6 @@ export class VoiceService {
     if (this.dc?.readyState === 'open') {
       this.dc.send(JSON.stringify(event));
     }
-  }
-
-  private async fetchSession(): Promise<{ clientSecret: string; sessionId: string }> {
-    const res = await fetch(API.voiceSession, { method: 'POST' });
-    if (!res.ok) throw new Error(`Session error: ${res.status}`);
-    const data = await res.json() as { clientSecret: string; sessionId: string };
-    return data;
   }
 
   private cleanup(): void {

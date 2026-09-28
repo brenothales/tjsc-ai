@@ -20,10 +20,10 @@ public class VoiceService {
 
     private static final Logger log = LoggerFactory.getLogger(VoiceService.class);
 
-    private static final String OPENAI_BASE_URL   = "https://api.openai.com";
-    private static final String REALTIME_SESSIONS = "/v1/realtime/sessions";
-    private static final String MODEL             = "gpt-live-1";
-    private static final String VOICE             = "verse";
+    private static final String OPENAI_BASE_URL = "https://api.openai.com";
+    private static final String LIVE_SESSIONS   = "/v1/live/sessions";
+    private static final String MODEL           = "gpt-live-1";
+    private static final String VOICE           = "verse";
 
     private final RestClient   restClient;
     private final String       systemPrompt;
@@ -39,8 +39,8 @@ public class VoiceService {
         this.systemPrompt = systemPromptResource.getContentAsString(StandardCharsets.UTF_8);
     }
 
-    public VoiceSessionResponse createSession() {
-        log.info("[VoiceService] criando sessão Realtime — model={} voice={}", MODEL, VOICE);
+    public VoiceSessionResponse createSession(String sdpOffer) {
+        log.info("[VoiceService] criando sessão Live — model={} voice={}", MODEL, VOICE);
 
         Map<String, Object> consultarAgenteTool = Map.of(
                 "type", "function",
@@ -58,27 +58,32 @@ public class VoiceService {
                 )
         );
 
-        Map<String, Object> body = Map.of(
+        Map<String, Object> sessionConfig = Map.of(
                 "model", MODEL,
                 "voice", VOICE,
                 "instructions", systemPrompt,
-                "input_audio_transcription", Map.of("model", "whisper-1"),
-                "turn_detection", Map.of("type", "server_vad"),
                 "tools", List.of(consultarAgenteTool),
                 "tool_choice", "auto"
         );
 
+        Map<String, Object> body = Map.of(
+                "session", sessionConfig,
+                "transport", Map.of(
+                        "type", "webrtc",
+                        "sdp", sdpOffer
+                )
+        );
+
         JsonNode response = restClient.post()
-                .uri(REALTIME_SESSIONS)
+                .uri(LIVE_SESSIONS)
                 .body(body)
                 .retrieve()
                 .body(JsonNode.class);
 
-        String sessionId    = response.path("id").asText();
-        String clientSecret = response.path("client_secret").path("value").asText();
-        long   expiresAt    = response.path("client_secret").path("expires_at").asLong();
+        String sessionId = response.path("session").path("id").asText();
+        String sdpAnswer = response.path("transport").path("sdp").asText();
 
-        log.info("[VoiceService] sessão criada — id={} expiresAt={}", sessionId, expiresAt);
-        return new VoiceSessionResponse(sessionId, clientSecret, expiresAt);
+        log.info("[VoiceService] sessão criada — id={}", sessionId);
+        return new VoiceSessionResponse(sessionId, sdpAnswer);
     }
 }
