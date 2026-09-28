@@ -1,0 +1,186 @@
+{
+  "app": {
+    "titulo": "TJSC AI",
+    "beta": "BETA",
+    "versao": "Versão 0.1.0 · Uso interno",
+    "rodape": "Diretoria de Tecnologia da Informação"
+  },
+  "tema": {
+    "claro": "Modo claro",
+    "escuro": "Modo escuro"
+  },
+  "chat": {
+    "nova_conversa": "Nova conversa",
+    "abrir_sidebar": "Abrir sidebar",
+    "como_ajudar": "Como posso ajudar hoje?"
+  },
+  "input": {
+    "templates_titulo": "Templates de prompt",
+    "placeholder": "Envie uma mensagem... (@ para mencionar)",
+    "parar": "Parar geração",
+    "enviar": "Enviar mensagem",
+    "dica": "Enter para enviar · Shift+Enter para nova linha · @ para mencionar",
+    "buscando": "Buscando..."
+  },
+  "sidebar": {
+    "nova_conversa": "Nova conversa",
+    "fechar": "Fechar sidebar",
+    "buscar": "Buscar conversas...",
+    "sem_resultado": "Nenhum resultado",
+    "sem_conversa": "Nenhuma conversa",
+    "favoritar": "Favoritar",
+    "desfavoritar": "Remover favorito",
+    "arquivar": "Arquivar",
+    "desarquivar": "Desarquivar",
+    "renomear": "Renomear",
+    "excluir": "Excluir",
+    "configuracoes": "Configurações",
+    "grupos": {
+      "hoje": "Hoje",
+      "ontem": "Ontem",
+      "ultimos_7": "Últimos 7 dias",
+      "ultimos_30": "Últimos 30 dias",
+      "mais_antigos": "Mais antigos",
+      "favoritos": "Favoritos",
+      "arquivadas": "Arquivadas"
+    }
+  },
+  "mensagem": {
+    "cache": "Resposta em cache",
+    "nova_resposta_titulo": "Solicitar nova resposta ao LLM (remove do cache)",
+    "nova_resposta": "Nova resposta"
+  },
+  "minuta": {
+    "titulo": "Minuta de Sentença",
+    "regenerar": "Regenerar minutas",
+    "versoes_salvas": "Versões salvas",
+    "iniciando": "Iniciando geração...",
+    "gerando": "Gerando versão",
+    "versoes_concluidas": "{{ count }} versão(ões) concluída(s) — aguardando as demais...",
+    "fechar": "Fechar",
+    "copiar_secao_titulo": "Copiar seção atual",
+    "copiar_secao": "Copiar seção",
+    "copiar_completa_titulo": "Copiar minuta completa",
+    "copiar_completa": "Copiar completa",
+    "secoes": {
+      "relatorio": "Relatório",
+      "fundamentacao": "Fundamentação",
+      "dispositivo": "Dispositivo"
+    },
+    "steps": {
+      "buscar_dados": "Coletando dados do processo",
+      "relatorio": "Relatório (compartilhado)",
+      "fundamentacao_procedente": "Fundamentação — Procedente",
+      "dispositivo_procedente": "Dispositivo — Procedente",
+      "fundamentacao_improcedente": "Fundamentação — Improcedente",
+      "dispositivo_improcedente": "Dispositivo — Improcedente",
+      "fundamentacao_parcial": "Fundamentação — Parcialmente procedente",
+      "dispositivo_parcial": "Dispositivo — Parcialmente procedente"
+    }
+  },
+  "painel": {
+    "voltar": "Voltar",
+    "gerando_minuta": "Gerando minuta...",
+    "acoes": "Ações",
+    "ver_minuta": "Ver Minuta",
+    "nova_versao": "Nova versão da minuta",
+    "gerar_minuta": "Gerar Minuta de Sentença",
+    "fechar": "Fechar painel",
+    "arrastar": "Arrastar para redimensionar",
+    "carregando": "Carregando...",
+    "nao_encontrado": "Processo não encontrado.",
+    "polo_ativo": "Ativo",
+    "polo_passivo": "Passivo",
+    "sem_movimentacao": "Nenhuma movimentação encontrada.",
+    "carregar_mais": "Carregar mais",
+    "carregando_docs": "Carregando documentos...",
+    "sem_documento": "Nenhum documento encontrado.",
+    "abas": {
+      "informacoes": "Informações",
+      "movimentacoes": "Movimentações",
+      "documentos": "Documentos"
+    },
+    "secoes": {
+      "processo": "Processo",
+      "partes": "Partes",
+      "magistrado": "Magistrado"
+    },
+    "campos": {
+      "classe": "Classe",
+      "assunto": "Assunto",
+      "comarca": "Comarca",
+      "autuacao": "Autuação",
+      "sentenca": "Sentença",
+      "valor": "Valor"
+    }
+  },
+  "configuracoes": {
+    "titulo": "Configurações",
+    "modelo": "Modelo",
+    "temperatura": "Temperatura",
+    "preciso": "Preciso (0.0)",
+    "criativo": "Criativo (2.0)",
+    "instrucoes": "Instruções adicionais",
+    "instrucoes_placeholder": "Ex: Responda sempre de forma resumida. Prefira listas a parágrafos.",
+    "instrucoes_hint": "Adicionado ao prompt do sistema em todas as conversas.",
+    "cancelar": "Cancelar",
+    "salvar": "Salvar"
+  },
+  "modelos": {
+    "gpt4o_mini": "GPT-4o Mini (padrão)",
+    "gpt4o": "GPT-4o",
+    "gpt4_turbo": "GPT-4 Turbo"
+  },
+  "tooltip": {
+    "consultando": "Consultando processo...",
+    "nao_encontrado": "Processo não encontrado.",
+    "secoes": {
+      "processo": "Processo",
+      "partes": "Partes",
+      "magistrado": "Magistrado",
+      "movimentacoes": "Movimentações"
+    },
+    "polo_ativo": "Ativo",
+    "polo_passivo": "Passivo"
+  },
+  "insights": {
+    "resumo": "Resumo",
+    "risco": "Análise de mérito",
+    "timeline": "Linha do tempo",
+    "prompt_resumo": "Faça um resumo completo do processo {{ numero }}",
+    "prompt_risco": "Faça uma análise de mérito do processo {{ numero }}: fundamentos jurídicos, probabilidade de êxito e pontos relevantes",
+    "prompt_timeline": "Apresente a linha do tempo das movimentações do processo {{ numero }} em ordem cronológica"
+  },
+  "templates": {
+    "categorias": {
+      "processos": "Processos",
+      "magistrados": "Magistrados",
+      "comarcas": "Comarcas",
+      "estatisticas": "Estatísticas"
+    },
+    "itens": {
+      "maior_valor":            { "label": "Maior valor de causa",      "texto": "Quais processos têm o maior valor de causa?" },
+      "mais_movimentacoes":     { "label": "Mais movimentações",         "texto": "Qual processo teve mais movimentações?" },
+      "por_classe":             { "label": "Por classe processual",      "texto": "Liste os processos da classe [CLASSE] na comarca de [COMARCA]" },
+      "arquivados":             { "label": "Processos arquivados",       "texto": "Quantos processos foram arquivados?" },
+      "sentenca_homologatoria": { "label": "Sentença homologatória",     "texto": "Processos com sentença homologatória de acordo" },
+      "mais_produtivos":        { "label": "Mais produtivos",            "texto": "Quais magistrados julgaram mais processos?" },
+      "por_comarca_mag":        { "label": "Por comarca",                "texto": "Quais magistrados atuaram na comarca de [COMARCA]?" },
+      "distribuicao_mag":       { "label": "Distribuição por magistrado","texto": "Como estão distribuídos os processos entre os magistrados?" },
+      "em_andamento_com":       { "label": "Processos em andamento",     "texto": "Processos em andamento na comarca de Florianópolis" },
+      "ranking_comarcas":       { "label": "Ranking de comarcas",        "texto": "Quais comarcas têm mais processos ativos?" },
+      "comparativo":            { "label": "Comparativo",                "texto": "Compare o volume de processos entre as comarcas de [COMARCA1] e [COMARCA2]" },
+      "visao_geral":            { "label": "Visão geral",                "texto": "Dê um resumo geral da base de processos: total, classes mais comuns e comarcas com mais casos" },
+      "distribuicao_classe":    { "label": "Distribuição por classe",    "texto": "Qual a distribuição de processos por classe processual?" },
+      "evolucao":               { "label": "Evolução temporal",          "texto": "Como evoluiu o número de processos distribuídos ao longo dos anos?" }
+    }
+  },
+  "sugestoes": [
+    "Quais processos têm o maior valor de causa?",
+    "Quais magistrados julgaram mais processos?",
+    "Processos em andamento na comarca de Florianópolis",
+    "Quantos processos foram arquivados?",
+    "Processos com sentença homologatória de acordo",
+    "Qual processo teve mais movimentações?"
+  ]
+}
