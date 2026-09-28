@@ -43,9 +43,10 @@ export class ChatInputComponent {
     () => !this.chat.hasMessages() && !this.value() && !this.disabled()
   );
 
-  readonly suggestions = computed<string[]>(() =>
-    this.translate.instant('sugestoes') ?? []
-  );
+  readonly suggestions = computed<string[]>(() => {
+    const result = this.translate.instant('sugestoes');
+    return Array.isArray(result) ? result : [];
+  });
 
   readonly templateCategories = computed<TemplateCategory[]>(() => {
     const t = (k: string) => this.translate.instant(k);
