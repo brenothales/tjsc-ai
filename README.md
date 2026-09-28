@@ -5,6 +5,8 @@
 
 Chat de IA que responde, em linguagem natural, perguntas sobre processos judiciais de um banco SQLite sintético fornecido pelo TJSC. O agente consulta o banco de forma autônoma, preserva contexto entre turnos e indica os dados usados em cada resposta.
 
+![TJSC AI — Interface de chat com painel de processo](frontend/tjsc-ai/public/screenshot.png)
+
 ---
 
 ## Tecnologias e Versões
