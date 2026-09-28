@@ -35,7 +35,6 @@ public class VoiceService {
                 .baseUrl(OPENAI_BASE_URL)
                 .defaultHeader("Authorization", "Bearer " + apiKey)
                 .defaultHeader("Content-Type", "application/json")
-                .defaultHeader("OpenAI-Beta", "realtime=v1")
                 .build();
         this.systemPrompt = systemPromptResource.getContentAsString(StandardCharsets.UTF_8);
     }
