@@ -1,0 +1,166 @@
+services:
+
+
+  mongodb:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./backend/mongodb:/data/db
+    networks:
+      - tjsc_net
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  mongo-express:
+    image: mongo-express:latest
+    restart: always
+    ports:
+      - "8084:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/
+      ME_CONFIG_BASICAUTH: true
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_PASSWORD}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - tjsc_net
+
+  redis:
+    image: redis:latest
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_volume_data:/data
+    networks:
+      - tjsc_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis_insight:
+    image: redislabs/redisinsight:1.14.0
+    restart: always
+    ports:
+      - "8001:8001"
+    volumes:
+      - redis_insight_volume_data:/db
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - tjsc_net
+
+
+  process-data-service:
+    build:
+      context: ./backend/process-data-service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      SQLITE_DATABASE_PATH: /app/data/desafio.sqlite
+    networks:
+      - tjsc_net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  process-mcp-server:
+    build:
+      context: ./backend/process-mcp-server
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8082:8082"
+    environment:
+      PROCESS_DATA_SERVICE_URL: http://process-data-service:8081
+    depends_on:
+      process-data-service:
+        condition: service_healthy
+    networks:
+      - tjsc_net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8082/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  process-agent:
+    build:
+      context: ./backend/process-agent
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8083:8083"
+    environment:
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_DATABASE: process-agent
+      MONGODB_USER: ${MONGO_USERNAME}
+      MONGODB_PASS: ${MONGO_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      MCP_SERVER_URL: http://process-mcp-server:8082
+      PROCESS_DATA_SERVICE_URL: http://process-data-service:8081
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      process-mcp-server:
+        condition: service_healthy
+    networks:
+      - tjsc_net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8083/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+
+  frontend:
+    build:
+      context: ./frontend/tjsc-ai
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "4200:80"
+    depends_on:
+      process-agent:
+        condition: service_healthy
+    networks:
+      - tjsc_net
+
+volumes:
+  redis_volume_data:
+  redis_insight_volume_data:
+
+networks:
+  tjsc_net:
+    driver: bridge
