@@ -6,6 +6,8 @@ import br.jus.tjsc.ai.agent.voice.api.dto.VoiceAgentResponse;
 import br.jus.tjsc.ai.agent.voice.api.dto.VoiceSessionRequest;
 import br.jus.tjsc.ai.agent.voice.api.dto.VoiceSessionResponse;
 import br.jus.tjsc.ai.agent.voice.application.VoiceService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -13,6 +15,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/voice")
 class VoiceController {
+
+    private static final Logger log = LoggerFactory.getLogger(VoiceController.class);
 
     private final VoiceService    voiceService;
     private final AgentService    agentService;
@@ -32,7 +36,15 @@ class VoiceController {
         String conversationId = (request.conversationId() != null && !request.conversationId().isBlank())
                 ? request.conversationId()
                 : UUID.randomUUID().toString();
+
+        log.info("[AGENT] tarefa delegada recebida — conversationId={}", conversationId);
+        long start = System.currentTimeMillis();
+
         String content = agentService.chatSync(request.message(), conversationId, null, null, null);
+
+        log.info("[AGENT] resposta gerada em {} ms", System.currentTimeMillis() - start);
+        log.info("[VOICE] resultado da delegação retornado ao GPT-Live");
+
         return new VoiceAgentResponse(content);
     }
 }

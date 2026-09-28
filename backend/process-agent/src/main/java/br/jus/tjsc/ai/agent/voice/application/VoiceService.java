@@ -29,7 +29,7 @@ public class VoiceService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     VoiceService(@Value("${spring.ai.openai.api-key}") String apiKey,
-                 @Value("classpath:prompts/agent_system.st") Resource systemPromptResource) throws IOException {
+                 @Value("classpath:prompts/voice_system.st") Resource systemPromptResource) throws IOException {
         this.restClient = RestClient.builder()
                 .baseUrl(OPENAI_BASE_URL)
                 .defaultHeader("Authorization", "Bearer " + apiKey)
