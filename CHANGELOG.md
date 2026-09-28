@@ -3,6 +3,42 @@
 Histórico de versões da Plataforma de IA — Diretoria de Tecnologia da Informação / TJSC.
 
 
+## [1.0.0](https://github.com/brenothales/tjsc-ai/compare/v1.0.0-beta.0...v1.0.0) (2026-09-28)
+
+
+### Novas Funcionalidades
+
+* voice — McpToolRegistry, VoiceLiveProperties e config via YAML ([ba12aa7](https://github.com/brenothales/tjsc-ai/commit/ba12aa7cc9aff9c68958cbfa044fbea4d22bd7b2))
+* voice — painel de ondas, estados, transcrição e encerramento gracioso ([70af470](https://github.com/brenothales/tjsc-ai/commit/70af47074b852555b16bc54306cc9d8c4bac5436))
+* voice_system.st, /mcp/tools debug endpoint e logs VOICE/AGENT ([1820e71](https://github.com/brenothales/tjsc-ai/commit/1820e719d409f83d2e824c2cf4dccaf62e6cdea5))
+* **voice-live:** add WebRTC + GPT-4o Realtime voice module — modular, plug/unplug via single line ([268b786](https://github.com/brenothales/tjsc-ai/commit/268b786af9295dfcf9a3da1ebb68a7961b33ab0c))
+* **voice-live:** implement WebRTC + Realtime tool calling via consultar_agente ([6951d06](https://github.com/brenothales/tjsc-ai/commit/6951d062e93c6679d3642ced5d1f52740a8d1413))
+
+
+### Correções
+
+* corrige pacotes para tools.jackson (Jackson 3.x) ([cb21192](https://github.com/brenothales/tjsc-ai/commit/cb21192e9d080ca5212f264f28bb58f2ce8d914a))
+* NG0955 duplicate track keys e 502 para erros OpenAI Realtime ([32c20c4](https://github.com/brenothales/tjsc-ai/commit/32c20c4923a75db486b63c221c8a4a0cbf07d302))
+* remove header OpenAI-Beta do endpoint REST de sessões Realtime ([f3dd318](https://github.com/brenothales/tjsc-ai/commit/f3dd318e59d921a17cae1f28b4655475859946a9))
+* remove session.voice inválido no GPT-Live 1 ([615c731](https://github.com/brenothales/tjsc-ai/commit/615c73167851ea7aab6d43bf8971d7223fe84c2e))
+* usa String+ObjectMapper em vez de JsonNode direto no RestClient (Jackson 3.x) ([d53eae9](https://github.com/brenothales/tjsc-ai/commit/d53eae9047e75660c201a49f67266c42c0cbd949))
+* **voice-live:** add OpenAI-Beta header and request logging for realtime sessions ([a796e71](https://github.com/brenothales/tjsc-ai/commit/a796e71b94ea7f83dae4a52e2cb8febb175864f4))
+* **voice-live:** fix RestClient base URL — use explicit uri() for realtime sessions endpoint ([9c5317c](https://github.com/brenothales/tjsc-ai/commit/9c5317cc0d9205bc516b0499d9533ff4c01a3895))
+
+
+### Refatoração
+
+* migra voice para GPT-Live 1 (POST /v1/live/sessions + SDP proxy) ([9366249](https://github.com/brenothales/tjsc-ai/commit/9366249dc9e84e9c717598e50a68a2b8fb360562))
+* usa delegation.type=client no GPT-Live 1 em vez de tool_choice ([6179c67](https://github.com/brenothales/tjsc-ai/commit/6179c67c220dcf792d486ec22f9c2d98f9d28d40))
+
+
+### Documentação
+
+* add interface screenshot to README ([1b9f908](https://github.com/brenothales/tjsc-ai/commit/1b9f908b87000bd5b2725e2fd4e51d7142722107))
+* improve README with features section and better structure ([000811c](https://github.com/brenothales/tjsc-ai/commit/000811ca72e3958cfed1c0bf637f091435165599))
+* knowledge — concept voice-live, cross-links e viz atualizado ([452ae55](https://github.com/brenothales/tjsc-ai/commit/452ae554bc1dfe834fc7d9e7683e52ed83915c6c))
+* remove cp sqlite step — database is already included in the repo ([7f7abbc](https://github.com/brenothales/tjsc-ai/commit/7f7abbc5b71aae2e4133b52740359eb50c6e51e0))
+
 ## 1.0.0-beta.0 (2026-09-28)
 
 

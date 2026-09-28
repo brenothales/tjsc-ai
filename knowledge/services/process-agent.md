@@ -142,6 +142,12 @@ Regras mais importantes:
 - Regra 13: NUNCA inclua CPF, CNPJ ou dados pessoais nas respostas
 - Regra 15: resumo de processo segue estrutura obrigatória (Identificação / Status atual / Partes / Objeto / Pontos de atenção)
 
+## Voice Live
+
+Ver: [/services/voice-live.md](/services/voice-live.md)
+
+Configuração no `application.yml` (`voice.live.*`): model, voice, system-prompt e sessions-path — sem valores fixos em código. `McpToolRegistry` converte as 14 tools MCP ao formato `function` do OpenAI Realtime para injeção na sessão. A negociação SDP usa `RestClient`; consultas delegadas usam o endpoint `/api/v1/chat` existente.
+
 ## Variáveis de ambiente
 
 | Variável | Padrão | Descrição |

@@ -1,0 +1,47 @@
+@keyframes voice-waveform {
+  0%, 100% { transform: scaleY(0.24); opacity: 0.65; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+.voice-live-panel {
+  min-height: 2.25rem;
+}
+
+.voice-wave {
+  height: 1.75rem;
+  min-width: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #818cf8;
+}
+
+.voice-wave__bar {
+  width: 2px;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: currentColor;
+  transform: scaleY(0.28);
+  animation: voice-waveform 820ms ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.voice-live-panel--speaking .voice-wave {
+  color: #34d399;
+}
+
+.voice-live-panel--speaking .voice-wave__bar {
+  animation-play-state: running;
+}
+
+.voice-live-panel--working .voice-wave {
+  color: #fbbf24;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-wave__bar {
+    animation: none;
+    transform: scaleY(0.6);
+  }
+}

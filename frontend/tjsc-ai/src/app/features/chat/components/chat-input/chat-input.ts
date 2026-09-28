@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ChatService } from '../../shared/services/chat.service';
 import { MentionService, MentionResult } from '../../shared/services/mention.service';
+import { VoiceButtonComponent } from '../voice-button/voice-button';
+import { VoiceService } from '../../shared/services/voice.service';
 import { Subject } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 
@@ -20,12 +22,13 @@ const MENTION_RE = /@([^@:\n]*)$/;
 
 @Component({
   selector: 'app-chat-input',
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, TranslatePipe, VoiceButtonComponent],
   templateUrl: './chat-input.html',
   styleUrl: './chat-input.css',
 })
 export class ChatInputComponent {
   private readonly chat = inject(ChatService);
+  protected readonly voice = inject(VoiceService);
   private readonly mentionSvc = inject(MentionService);
   private readonly translate = inject(TranslateService);
 
@@ -37,14 +40,16 @@ export class ChatInputComponent {
 
   readonly value = signal('');
   readonly templatesOpen = signal(false);
+  protected readonly waveformBars = Array.from({ length: 17 }, (_, index) => index);
 
   readonly showSuggestions = computed(
-    () => !this.chat.hasMessages() && !this.value() && !this.disabled()
+    () => !this.voice.isActive && !this.chat.hasMessages() && !this.value() && !this.disabled()
   );
 
-  readonly suggestions = computed<string[]>(() =>
-    this.translate.instant('sugestoes') ?? []
-  );
+  readonly suggestions = computed<string[]>(() => {
+    const result = this.translate.instant('sugestoes');
+    return Array.isArray(result) ? result : [];
+  });
 
   readonly templateCategories = computed<TemplateCategory[]>(() => {
     const t = (k: string) => this.translate.instant(k);

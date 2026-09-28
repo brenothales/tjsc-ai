@@ -75,6 +75,11 @@ export class ChatService {
     this.messages.set([]);
   }
 
+  setVoiceConversation(id: string): void {
+    this.conversationId.set(id);
+    this.messages.set([]);
+  }
+
   async sendMessage(
     content: string,
     opts?: { insightKey?: string; bypassCache?: boolean }

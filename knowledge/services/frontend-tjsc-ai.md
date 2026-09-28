@@ -117,6 +117,12 @@ async refreshInsight(messageId: string): void {
 | `processo-panel` | Painel lateral com movimentações/documentos do processo |
 | `settings-modal` | Configurações: modelo, temperatura, system extra |
 
+## Voice Live
+
+Ver: [/services/voice-live.md](/services/voice-live.md)
+
+`VoiceService` gerencia `RTCPeerConnection` + `RTCDataChannel` com uma máquina de 9 estados (Signals). Durante `voice.isActive`, o textarea do `chat-input` é substituído por um painel de ondas animadas com status e transcrição em tempo real. `ChatPageComponent` escuta `messageAdded` para recarregar o histórico a cada delegação concluída. `ChatService.setVoiceConversation(id)` seta o UUID sem disparo de `loadConversation`.
+
 ## Proxy para backend
 
 `proxy.conf.json` redireciona `/api/v1/` → `http://localhost:8083/api/v1/` em desenvolvimento. Em Docker, nginx serve o frontend e faz proxy interno para `process-agent:8083`.

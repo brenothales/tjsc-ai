@@ -47,4 +47,6 @@ Thumbs.db
 node_modules/
 .pnpm-store/
 package-lock.json
+/pnpm-lock.yaml
+/package.json
 .release-it.json
