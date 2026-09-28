@@ -85,13 +85,7 @@ graph TD
 
 ## Como executar (Docker — recomendado)
 
-### 1. Copiar o banco de dados
-
-```bash
-cp desafio.sqlite backend/process-data-service/data/desafio.sqlite
-```
-
-### 2. Configurar variáveis de ambiente
+### 1. Configurar variáveis de ambiente
 
 ```bash
 cp .env.example .env
@@ -148,7 +142,6 @@ Os serviços têm dependências entre si — respeite a ordem abaixo:
 
 ```bash
 cd backend/process-data-service
-cp ../../desafio.sqlite data/desafio.sqlite
 ./mvnw spring-boot:run
 ```
 
