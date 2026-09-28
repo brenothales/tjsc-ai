@@ -1,0 +1,14 @@
+{
+  "name": "tjsc-ai-platform",
+  "version": "1.0.0",
+  "description": "Plataforma de IA para magistrados do TJSC — Diretoria de Tecnologia da Informação",
+  "private": true,
+  "scripts": {
+    "release": "release-it",
+    "release:dry": "release-it --dry-run"
+  },
+  "devDependencies": {
+    "@release-it/conventional-changelog": "^8.0.2",
+    "release-it": "^17.11.0"
+  }
+}

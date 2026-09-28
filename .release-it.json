@@ -1,0 +1,35 @@
+{
+  "git": {
+    "commitMessage": "chore: release v${version}",
+    "tagName": "v${version}",
+    "tagAnnotation": "TJSC AI Platform v${version}"
+  },
+  "github": {
+    "release": false
+  },
+  "npm": {
+    "publish": false
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          { "type": "feat",     "section": "Novas Funcionalidades" },
+          { "type": "fix",      "section": "Correções" },
+          { "type": "perf",     "section": "Performance" },
+          { "type": "refactor", "section": "Refatoração" },
+          { "type": "docs",     "section": "Documentação" },
+          { "type": "chore",    "hidden": true },
+          { "type": "ci",       "hidden": true },
+          { "type": "test",     "hidden": true }
+        ]
+      },
+      "infile": "CHANGELOG.md",
+      "header": "# Changelog — TJSC AI Platform\n\nHistórico de versões da Plataforma de IA — Diretoria de Tecnologia da Informação / TJSC.\n"
+    }
+  },
+  "hooks": {
+    "after:bump": "cd frontend/tjsc-ai && pnpm version ${version} --no-git-tag-version"
+  }
+}
