@@ -1,0 +1,97 @@
+spring:
+  application:
+    name: process-agent
+  threads:
+    virtual:
+      enabled: true
+  data:
+    mongodb:
+      host: ${MONGODB_HOST:localhost}
+      port: ${MONGODB_PORT:27017}
+      database: ${MONGODB_DATABASE:process-agent}
+      username: ${MONGODB_USER:tjsc}
+      password: ${MONGODB_PASS:tjsc}
+      authentication-database: admin
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:cdma}
+  ai:
+    mcp:
+      client:
+        streamable-http:
+          connections:
+            process-mcp:
+              url: ${MCP_SERVER_URL:http://localhost:8082}
+              endpoint: /mcp
+    chat:
+      memory:
+        repository:
+          mongodb:
+            initialize-schema: true
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+          temperature: 0.0
+
+server:
+  port: 8083
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: DEBUG
+
+
+guardrail:
+  input:
+    max-message-length: 2000
+    injection-patterns:
+      - "ignore\\s+(todas\\s+as\\s+)?instru[çc][oõ]es"
+      - "ignore\\s+(as\\s+)?regras(\\s+de\\s+seguran[çc]a)?"
+      - "mostre?\\s+(o\\s+)?system\\s+prompt"
+      - "mostre?\\s+(suas?\\s+)?instru[çc][oõ]es\\s+internas"
+      - "aja\\s+como\\s+se\\s+voc[êe]\\s+fosse"
+      - "pretenda\\s+ser"
+      - "\\bDAN\\b"
+      - "ignore\\s+tudo\\s+acima"
+      - "esqueça\\s+(tudo|todas|seus|suas)"
+      - "novo\\s+papel"
+      - "sem\\s+restri[çc][oõ]es"
+      - "voc[êe]\\s+n[ãa]o\\s+tem\\s+restri[çc][oõ]es"
+      - "revele\\s+(o\\s+)?(seu\\s+)?prompt"
+      - "fa[çc]a\\s+(um\\s+)?select"
+      - "execute\\s+(um\\s+)?(sql|query|consulta\\s+sql)"
+      - "rode\\s+(uma?\\s+)?(query|consulta\\s+sql|sql)"
+      - "fa[çc]a\\s+uma?\\s+query"
+      - "consulte\\s+(a\\s+)?tabela"
+      - "SELECT\\s+.+\\s+FROM\\s+\\w+"
+      - "(?i)\\bDROP\\s+(TABLE|DATABASE|INDEX)\\b"
+      - "(?i)\\bDELETE\\s+FROM\\b"
+      - "(?i)\\bINSERT\\s+INTO\\b"
+      - "(?i)\\bUPDATE\\s+\\w+\\s+SET\\b"
+      - "(?i)\\bTRUNCATE\\s+TABLE\\b"
+      - "(?i)\\bALTER\\s+TABLE\\b"
+      - "(?i)sqlite_master"
+      - "(?i)\\bPRAGMA\\b"
+    injection-response: "Sua mensagem foi identificada como potencialmente maliciosa e não pôde ser processada."
+    size-exceeded-response: "Sua mensagem é muito longa. Por favor, reformule de forma mais concisa."
+  output:
+    sensitive-patterns:
+      - "sk-proj-[A-Za-z0-9_-]{20,}"
+      - "sk-[A-Za-z0-9]{48}"
+      - "OPENAI_API_KEY"
+      - "mongodb://[^\\s]*:[^\\s]*@"
+      - "(?i)password\\s*[:=]\\s*\\S+"
+      - "(?i)secret\\s*[:=]\\s*\\S+"
+    sanitized-response: "A resposta foi filtrada por conter informações potencialmente sensíveis."
