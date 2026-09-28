@@ -19,32 +19,36 @@ public class VoiceService {
 
     private static final Logger log = LoggerFactory.getLogger(VoiceService.class);
 
-    private static final String OPENAI_BASE_URL = "https://api.openai.com";
-    private static final String LIVE_SESSIONS   = "/v1/live/sessions";
-    private static final String MODEL           = "gpt-live-1";
-    private static final String VOICE           = "verse";
-
     private final RestClient   restClient;
     private final String       systemPrompt;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final VoiceLiveProperties voiceProperties;
+    private final ObjectMapper objectMapper;
 
-    VoiceService(@Value("${spring.ai.openai.api-key}") String apiKey,
-                 @Value("classpath:prompts/voice_system.st") Resource systemPromptResource) throws IOException {
-        this.restClient = RestClient.builder()
-                .baseUrl(OPENAI_BASE_URL)
+    VoiceService(RestClient.Builder restClientBuilder,
+                 VoiceLiveProperties voiceProperties,
+                 ObjectMapper objectMapper,
+                 @Value("${spring.ai.openai.base-url:https://api.openai.com}") String baseUrl,
+                 @Value("${spring.ai.openai.api-key}") String apiKey,
+                 @Value("${voice.live.system-prompt:classpath:prompts/voice_system.st}") Resource systemPromptResource) throws IOException {
+        this.restClient = restClientBuilder
+                .baseUrl(baseUrl)
                 .defaultHeader("Authorization", "Bearer " + apiKey)
                 .defaultHeader("Content-Type", "application/json")
                 .build();
+        this.voiceProperties = voiceProperties;
+        this.objectMapper = objectMapper;
         this.systemPrompt = systemPromptResource.getContentAsString(StandardCharsets.UTF_8);
     }
 
     public VoiceSessionResponse createSession(String sdpOffer) throws tools.jackson.core.JacksonException {
-        log.info("[VoiceService] criando sessão Live — model={} voice={}", MODEL, VOICE);
+        log.info("[VoiceService] criando sessão Live — model={} voice={}",
+                voiceProperties.getModel(), voiceProperties.getVoice());
 
         Map<String, Object> sessionConfig = Map.of(
-                "model", MODEL,
+                "model", voiceProperties.getModel(),
                 "instructions", systemPrompt,
-                "delegation", Map.of("type", "client")
+                "delegation", Map.of("type", "client"),
+                "audio", Map.of("output", Map.of("voice", voiceProperties.getVoice()))
         );
 
         Map<String, Object> body = Map.of(
@@ -56,7 +60,7 @@ public class VoiceService {
         );
 
         String raw = restClient.post()
-                .uri(LIVE_SESSIONS)
+                .uri(voiceProperties.getSessionsPath())
                 .body(body)
                 .retrieve()
                 .body(String.class);
