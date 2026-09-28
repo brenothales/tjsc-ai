@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: process-mcp-server
+  threads:
+    virtual:
+      enabled: true
+  ai:
+    mcp:
+      server:
+        name: process-mcp-server-tjsc
+        version: 1.0.0
+        instructions: >
+          Servidor MCP para consulta de processos judiciais do TJSC.
+          Utilize as ferramentas disponíveis para buscar dados processuais por número CNJ,
+          pesquisar processos por parte/comarca/classe, e obter documentos com texto integral.
+        protocol: STREAMABLE
+        streamable-http:
+          mcp-endpoint: /mcp
+
+server:
+  port: 8082
+
+process:
+  data:
+    service:
+      url: ${PROCESS_DATA_SERVICE_URL:http://localhost:8081}
+
+bootui:
+  enabled=ON
