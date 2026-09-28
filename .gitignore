@@ -15,7 +15,7 @@ pnpm-debug.log*
 # Builds
 dist/
 build/
-out/
+/out/
 *.jar
 !*-sources.jar
 
