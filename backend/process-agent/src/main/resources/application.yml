@@ -30,19 +30,11 @@ spring:
           mongodb:
             initialize-schema: true
     openai:
-      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
       api-key: ${OPENAI_API_KEY}
       chat:
         options:
           model: gpt-4o-mini
           temperature: 0.0
-
-voice:
-  live:
-    sessions-path: /v1/live/sessions
-    model: ${OPENAI_LIVE_MODEL:gpt-live-1}
-    voice: ${OPENAI_LIVE_VOICE:verse}
-    system-prompt: classpath:prompts/voice_system.st
 
 server:
   port: 8083
