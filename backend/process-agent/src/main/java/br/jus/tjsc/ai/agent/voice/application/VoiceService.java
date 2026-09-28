@@ -43,7 +43,6 @@ public class VoiceService {
 
         Map<String, Object> sessionConfig = Map.of(
                 "model", MODEL,
-                "voice", VOICE,
                 "instructions", systemPrompt,
                 "delegation", Map.of("type", "client")
         );
