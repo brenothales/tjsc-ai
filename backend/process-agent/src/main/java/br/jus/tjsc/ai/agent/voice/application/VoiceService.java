@@ -14,8 +14,9 @@ import java.util.Map;
 @Service
 public class VoiceService {
 
-    private static final String REALTIME_SESSIONS_URL = "https://api.openai.com/v1/realtime/sessions";
-    private static final String MODEL = "gpt-4o-realtime-preview";
+    private static final String OPENAI_BASE_URL    = "https://api.openai.com";
+    private static final String REALTIME_SESSIONS  = "/v1/realtime/sessions";
+    private static final String MODEL = "gpt-4o-realtime-preview-2024-12-17";
     private static final String VOICE = "verse";
 
     private final RestClient restClient;
@@ -24,7 +25,7 @@ public class VoiceService {
     VoiceService(@Value("${spring.ai.openai.api-key}") String apiKey,
                  @Value("classpath:prompts/agent_system.st") Resource systemPromptResource) throws IOException {
         this.restClient = RestClient.builder()
-                .baseUrl(REALTIME_SESSIONS_URL)
+                .baseUrl(OPENAI_BASE_URL)
                 .defaultHeader("Authorization", "Bearer " + apiKey)
                 .defaultHeader("Content-Type", "application/json")
                 .build();
@@ -41,6 +42,7 @@ public class VoiceService {
         );
 
         JsonNode response = restClient.post()
+                .uri(REALTIME_SESSIONS)
                 .body(body)
                 .retrieve()
                 .body(JsonNode.class);
