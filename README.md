@@ -9,6 +9,19 @@ Chat de IA que responde, em linguagem natural, perguntas sobre processos judicia
 
 ---
 
+## Funcionalidades
+
+- **Consulta conversacional** — perguntas em português sobre processos, partes, magistrados e movimentações
+- **Painel de processo** — ao clicar em qualquer número CNJ na resposta, abre painel lateral com informações, movimentações e documentos
+- **Insights com cache** — resumo, análise de risco e timeline de processos cacheados no Redis (TTL 1h) para evitar chamadas repetidas ao LLM
+- **Minuta de sentença** — geração assistida por IA disponível exclusivamente para processos em andamento
+- **Memória de conversa** — contexto preservado entre turnos via MongoDB (janela de 20 mensagens)
+- **Streaming em tempo real** — respostas via SSE, token a token
+- **Guardrails em 5 camadas** — proteção contra injeção de prompt, vazamento de dados sensíveis e abuso de SQL
+- **Menção de processos** — digite `@` no chat para buscar e mencionar processos por número
+
+---
+
 ## Tecnologias e Versões
 
 | Camada | Tecnologia | Versão |
