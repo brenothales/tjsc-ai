@@ -5,8 +5,7 @@
 # Secrets
 .env
 
-# Node
-node_modules/
+# Node (frontend — frontend/tjsc-ai)
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -41,6 +40,11 @@ backend/**/*.log
 .DS_Store
 Thumbs.db
 
+# Release (release-it — raiz do monorepo)
+# O package.json da raiz existe apenas para o release-it + conventional-changelog.
+# node_modules/ e .pnpm-store/ são gerados por: pnpm install (na raiz).
+# Outros devs não precisam rodar pnpm na raiz para subir os serviços.
 node_modules/
-package-lock.json
 .pnpm-store/
+package-lock.json
+.release-it.json
